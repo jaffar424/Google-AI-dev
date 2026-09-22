@@ -1,0 +1,6 @@
+{
+  "name": "Party Planner Shopping Agent",
+  "description": "AI-powered party planning assistant that calculates quantities, generates categorized shopping lists, optimizes budgets, and provides step-by-step prep timelines.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
