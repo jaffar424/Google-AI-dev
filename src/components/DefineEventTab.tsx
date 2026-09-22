@@ -164,6 +164,28 @@ export const DefineEventTab: React.FC<DefineEventTabProps> = ({
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div 
+            onClick={() => handleSelectTemplate('tropical_birthday')}
+            className="cursor-pointer group relative bg-white rounded-2xl p-5 border-2 border-teal-500 shadow-md hover:shadow-xl transition-all"
+          >
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-3xl">🌴</span>
+              <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-teal-100 text-teal-800 border border-teal-300">
+                $290 Budget · 20 Guests
+              </span>
+            </div>
+            <h3 className="font-bold text-slate-900 group-hover:text-teal-700 transition-colors">
+              Tropical Island Birthday Celebration
+            </h3>
+            <p className="text-xs text-slate-500 mt-1 line-clamp-2">
+              Next Saturday: Teriyaki glazed chicken skewers, Hawaiian sweet rolls, coconut rum punch, and custom bakery birthday cake!
+            </p>
+            <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-teal-600">
+              <span>Load Tropical Birthday Blueprint</span>
+              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+            </div>
+          </div>
+
+          <div 
             onClick={() => handleSelectTemplate('taco_fiesta')}
             className="cursor-pointer group relative bg-white rounded-2xl p-5 border border-slate-200 hover:border-teal-500 hover:shadow-lg transition-all"
           >

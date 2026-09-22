@@ -2,6 +2,118 @@ import { PartyPlan } from '../types/party';
 import { calculatePartyDrinks, calculatePartyFood } from './calculator';
 
 export const PARTY_TEMPLATES: Record<string, Partial<PartyPlan>> = {
+  tropical_birthday: {
+    details: {
+      id: 'template_tropical_birthday',
+      title: 'Tropical Island Birthday Celebration',
+      theme: 'Tropical Tiki Oasis with Island Rum Punch, Fresh Pineapple & Teriyaki',
+      eventType: 'Birthday Celebration',
+      guestCountAdults: 18,
+      guestCountKids: 2,
+      durationHours: 4.5,
+      budgetLimit: 290,
+      drinkStyle: 'cocktail_special',
+      cateringStyle: 'semi_homemade',
+      dietaryRestrictions: ['Gluten-Free Friendly', 'Nut-Free Safe'],
+      specialRequests: 'Scheduled for Next Saturday. Include fresh pineapples, party ice for tropical coolers, bamboo tiki plates, custom bakery birthday cake, and coconut rum punch.',
+    },
+    themeTitle: 'CymbalMart Tropical Island Birthday Celebration',
+    themeDescription: 'A sun-drenched tropical oasis celebration for 20 guests next Saturday featuring teriyaki glazed chicken skewers, Hawaiian sweet rolls, mango lime salsa, coconut rum punch, and a signature passionfruit spritz.',
+    vibeKeywords: ['Tropical Vibes', 'Island Reggae & Ukulele', 'Exotic Fruit', 'Birthday Toast', 'Tiki Ambience'],
+    signatureCocktail: {
+      name: 'Island Breeze Coconut Rum & Passionfruit Punch',
+      description: 'A batch cocktail of Caribbean white & spiced rum, passionfruit juice, fresh pineapple juice, lime, and coconut cream topped with toasted coconut flakes.',
+      ingredients: ['750ml Caribbean White Rum', '750ml Spiced Rum', 'CymbalMart 100% Pineapple Juice', 'Passionfruit Nectar', 'Fresh Limes (15 units)', 'Cream of Coconut'],
+    },
+    signatureMocktail: {
+      name: 'Sparkling Guava Mango Tiki Spritzer',
+      description: 'Chilled guava nectar and crushed sweet mango shaken with fresh lime juice, topped with sparkling coconut water and a maraschino cherry.',
+      ingredients: ['Guava Nectar (2 bottles)', 'CymbalMart Fresh Mangoes', 'Sparkling Coconut Water (6-pack)', 'Fresh Mint Sprigs', 'Lime wedges'],
+    },
+    items: [
+      { id: 'tb_1', name: 'Boneless Skinless Chicken Breasts & Thighs (Teriyaki Skewers)', category: 'proteins', quantity: 6, unit: 'lbs', estimatedPrice: 22, store: 'CymbalMart Supercenter', priority: 'essential', notes: 'Marinate in pineapple ginger teriyaki; thread onto bamboo skewers', isBought: false, isCymbalMartBrand: true, brandName: 'CymbalMart Butcher Select', aisleNumber: 'Aisle 4' },
+      { id: 'tb_2', name: 'Sweet Hawaiian Glazed Pulled Pork', category: 'proteins', quantity: 4, unit: 'lbs', estimatedPrice: 18, store: 'CymbalMart Supercenter', priority: 'essential', notes: 'Slow cooker with pineapple chunks & brown sugar glaze', isBought: false, isCymbalMartBrand: true, brandName: 'CymbalMart Butcher Select', aisleNumber: 'Aisle 4' },
+      { id: 'tb_3', name: 'Plant-Based Island Pineapple Glazed Meatless Sliders', category: 'proteins', quantity: 1, unit: 'pack (8 patties)', estimatedPrice: 7.5, store: 'CymbalMart Supercenter', priority: 'recommended', notes: 'Vegetarian and vegan guest main protein', isBought: false, isCymbalMartBrand: true, brandName: 'CymbalMart Organics', aisleNumber: 'Aisle 8 (Freezer)' },
+      { id: 'tb_4', name: 'Golden Sweet Whole Ripe Pineapples', category: 'produce', quantity: 3, unit: 'units', estimatedPrice: 8.5, store: 'CymbalMart Fresh Market', priority: 'essential', notes: 'Hollow 1 for punch bowl, slice 2 for grilling & fruit skewers', isBought: false, aisleNumber: 'Aisle 1' },
+      { id: 'tb_5', name: 'Fresh Mangoes & Red Bell Peppers (for Mango Salsa)', category: 'produce', quantity: 5, unit: 'units', estimatedPrice: 6, store: 'CymbalMart Fresh Market', priority: 'essential', notes: 'Dice with red onion, jalapeño, cilantro & lime', isBought: false, aisleNumber: 'Aisle 1' },
+      { id: 'tb_6', name: 'Fresh Key Limes & Cocktail Mint', category: 'produce', quantity: 2, unit: 'bags + bunches', estimatedPrice: 5.5, store: 'CymbalMart Fresh Market', priority: 'essential', notes: 'For rum punch batch & garnish', isBought: false, aisleNumber: 'Aisle 1' },
+      { id: 'tb_7', name: 'Crisp Island Coleslaw Blend (Cabbage & Carrots)', category: 'produce', quantity: 3, unit: 'bags', estimatedPrice: 6.5, store: 'CymbalMart Fresh Market', priority: 'essential', notes: 'Toss with sesame ginger lime dressing', isBought: false, isCymbalMartBrand: true, brandName: 'CymbalMart Select', aisleNumber: 'Aisle 1' },
+      { id: 'tb_8', name: 'CymbalMart Bakery Tropical Mango Passionfruit Birthday Cake (8-inch)', category: 'bakery', quantity: 1, unit: 'whole cake', estimatedPrice: 24, store: 'CymbalMart Supercenter', priority: 'essential', notes: 'Custom birthday inscription: Happy Birthday! 20 Servings', isBought: false, isCymbalMartBrand: true, brandName: 'CymbalMart Artisan Bakery', aisleNumber: 'Aisle 2' },
+      { id: 'tb_9', name: 'Original Hawaiian Sweet Rolls', category: 'bakery', quantity: 24, unit: 'rolls (2 packs)', estimatedPrice: 8, store: 'CymbalMart Supercenter', priority: 'essential', notes: 'For pulled pork and island sliders', isBought: false, isCymbalMartBrand: true, brandName: 'CymbalMart Bakery', aisleNumber: 'Aisle 2' },
+      { id: 'tb_10', name: 'Cream of Coconut (Coco Lopez or Select)', category: 'dairy_charcuterie', quantity: 2, unit: 'cans', estimatedPrice: 6, store: 'CymbalMart Supercenter', priority: 'essential', notes: 'For batch cocktails and mocktails', isBought: false, isCymbalMartBrand: true, brandName: 'CymbalMart Select', aisleNumber: 'Aisle 6' },
+      { id: 'tb_11', name: 'Sweet Maui Onion & Plantain Chips', category: 'pantry_snacks', quantity: 3, unit: 'large bags', estimatedPrice: 10.5, store: 'CymbalMart Supercenter', priority: 'essential', notes: 'Serve with fresh mango salsa and guacamole', isBought: false, isCymbalMartBrand: true, brandName: 'CymbalMart Select', aisleNumber: 'Aisle 5' },
+      { id: 'tb_12', name: 'Sweet Soy Teriyaki Marinade & Sesame Glaze', category: 'pantry_snacks', quantity: 2, unit: 'bottles', estimatedPrice: 6, store: 'CymbalMart Supercenter', priority: 'essential', isBought: false, isCymbalMartBrand: true, brandName: 'CymbalMart Select', aisleNumber: 'Aisle 5' },
+      { id: 'tb_13', name: 'Caribbean White Rum & Aged Spiced Rum (750ml bottles)', category: 'alcohol', quantity: 2, unit: 'bottles', estimatedPrice: 38, store: 'CymbalMart Wine & Spirits', priority: 'essential', notes: 'For batch Tropical Rum Punch dispenser', isBought: false, aisleNumber: 'Aisle 7' },
+      { id: 'tb_14', name: 'Kona Big Wave Golden Ale & Island Seltzers', category: 'alcohol', quantity: 24, unit: 'cans', estimatedPrice: 32, store: 'CymbalMart Wine & Spirits', priority: 'essential', notes: 'Tropical craft beer & passionfruit seltzers', isBought: false, aisleNumber: 'Aisle 7' },
+      { id: 'tb_15', name: 'Prosecco Sparkling Bubbly (for Birthday Toast)', category: 'alcohol', quantity: 2, unit: 'bottles', estimatedPrice: 22, store: 'CymbalMart Wine & Spirits', priority: 'recommended', notes: 'For birthday cake toast', isBought: false, isCymbalMartBrand: true, brandName: 'CymbalMart Cellars', aisleNumber: 'Aisle 7' },
+      { id: 'tb_16', name: '100% Pineapple Juice & Passionfruit Nectar', category: 'beverages_mixers', quantity: 4, unit: 'bottles/cans', estimatedPrice: 11, store: 'CymbalMart Supercenter', priority: 'essential', isBought: false, isCymbalMartBrand: true, brandName: 'CymbalMart Select', aisleNumber: 'Aisle 6' },
+      { id: 'tb_17', name: 'Sparkling Coconut Mineral Water', category: 'beverages_mixers', quantity: 12, unit: 'cans', estimatedPrice: 9.5, store: 'CymbalMart Supercenter', priority: 'recommended', isBought: false, isCymbalMartBrand: true, brandName: 'CymbalMart Select', aisleNumber: 'Aisle 6' },
+      { id: 'tb_18', name: 'CymbalMart Pure Cubed Party Ice', category: 'ice', quantity: 30, unit: 'lbs (3 bags)', estimatedPrice: 9, store: 'CymbalMart Supercenter', priority: 'essential', notes: 'Chilling rum punch, beer coolers, and tropical glasses', isBought: false, isCymbalMartBrand: true, brandName: 'CymbalMart Ice', aisleNumber: 'Aisle 8 (Freezer)' },
+      { id: 'tb_19', name: 'Eco-Bamboo Island Plates & Napkins (50 ct)', category: 'tableware', quantity: 1, unit: 'pack', estimatedPrice: 11, store: 'CymbalMart Supercenter', priority: 'essential', isBought: false, isCymbalMartBrand: true, brandName: 'CymbalMart Earth First', aisleNumber: 'Aisle 9' },
+      { id: 'tb_20', name: 'Tropical Tiki Birthday Leis & Palm Leaf Garland', category: 'decor_ambience', quantity: 1, unit: 'pack', estimatedPrice: 13, store: 'CymbalMart Supercenter', priority: 'recommended', isBought: false, aisleNumber: 'Aisle 10' },
+      { id: 'tb_21', name: 'Birthday Cake Candles & Sparklers', category: 'decor_ambience', quantity: 1, unit: 'pack', estimatedPrice: 3.5, store: 'CymbalMart Supercenter', priority: 'essential', isBought: false, aisleNumber: 'Aisle 10' },
+    ],
+    costSavingTips: [
+      'Batch the Tropical Rum Punch in a 2-gallon drink dispenser with pineapple rings floating on top — saves 40% vs. individual mixed drinks.',
+      'Whole sweet pineapples at CymbalMart ($2.89/unit) are 60% cheaper than pre-sliced fruit cups and make stunning table centerpieces.',
+      'CymbalMart Artisan Bakery 8-inch round cakes deliver customized birthday flair for $24, half the price of boutique bakeries.',
+      'Hawaiian pulled pork made with pork shoulder and sweet soy glaze feeds 20 guests abundantly for under $2.20 per plate.'
+    ],
+    timeline: [
+      {
+        phaseName: '1 Week Before',
+        timeframe: '7 Days Out',
+        tasks: [
+          { id: 'tb_t1', task: 'Confirm 20 guest RSVPs and birthday cake custom message with CymbalMart Bakery', completed: false, category: 'Host Ready' },
+          { id: 'tb_t2', task: 'Check tropical playlist and prepare outdoor tiki torches / string lights', completed: false, category: 'Decor & Ambience' },
+          { id: 'tb_t3', task: 'Reserve CymbalMart Curbside Pickup slot for Next Saturday 10:00 AM', completed: false, category: 'Shopping' }
+        ]
+      },
+      {
+        phaseName: '2 Days Before',
+        timeframe: 'Thursday',
+        tasks: [
+          { id: 'tb_t4', task: 'Soak bamboo skewers in water so they do not char on the grill', completed: false, category: 'Food Prep' },
+          { id: 'tb_t5', task: 'Assemble party coolers and rinse beverage dispensers', completed: false, category: 'Bar Setup' }
+        ]
+      },
+      {
+        phaseName: 'Day Before',
+        timeframe: 'Friday Evening',
+        tasks: [
+          { id: 'tb_t6', task: 'Marinate chicken in teriyaki sauce and prep pineapple glaze for pulled pork', completed: false, category: 'Food Prep' },
+          { id: 'tb_t7', task: 'Dice mangoes and bell peppers for the mango lime salsa', completed: false, category: 'Food Prep' },
+          { id: 'tb_t8', task: 'Chill tropical seltzers, beers, and fruit juices', completed: false, category: 'Bar Setup' }
+        ]
+      },
+      {
+        phaseName: 'Saturday Morning',
+        timeframe: 'Next Saturday 10:00 AM',
+        tasks: [
+          { id: 'tb_t9', task: 'Pick up CymbalMart Curbside order: Birthday cake, 30 lbs party ice & fresh mint', completed: false, category: 'Shopping' },
+          { id: 'tb_t10', task: 'Mix batch Island Breeze Coconut Rum Punch in drink dispenser', completed: false, category: 'Bar Setup' },
+          { id: 'tb_t11', task: 'Hang palm leaf garland, arrange floral leis, and lay bamboo tableware', completed: false, category: 'Decor & Ambience' }
+        ]
+      },
+      {
+        phaseName: '1 Hour Before',
+        timeframe: 'Next Saturday 4:00 PM',
+        tasks: [
+          { id: 'tb_t12', task: 'Grill teriyaki chicken skewers until glazed and caramelized', completed: false, category: 'Food Prep' },
+          { id: 'tb_t13', task: 'Fill ice coolers with beer, seltzers, and sparkling coconut waters', completed: false, category: 'Bar Setup' },
+          { id: 'tb_t14', task: 'Set out chips and mango salsa; light tiki candles and start island music', completed: false, category: 'Host Ready' }
+        ]
+      }
+    ],
+    runOfShow: [
+      { time: '5:00 PM', activity: 'Guest Arrival & Tropical Welcome Punch', tip: 'Hand each guest a floral lei and a glass of chilled Coconut Rum Punch or Guava Tiki Spritz.' },
+      { time: '5:45 PM', activity: 'Plantain Chips & Fresh Mango Salsa Station', tip: 'Keep grazing relaxed with light bites while chicken skewers finish caramelizing.' },
+      { time: '6:30 PM', activity: 'Island Dinner Buffet Opens', tip: 'Serve warm teriyaki skewers, glazed pulled pork sliders, and sesame slaw.' },
+      { time: '8:00 PM', activity: 'Birthday Cake Presentation & Prosecco Toast', tip: 'Dim lights, bring out sparkler candles on the mango passionfruit cake, and pour Prosecco flutes.' },
+      { time: '9:30 PM', activity: 'Island Sunset Social & Reggae Chill', tip: 'Enjoy tropical desserts, island vibes, and wind down.' }
+    ]
+  },
+
   taco_fiesta: {
     details: {
       id: 'template_taco_fiesta',
@@ -288,10 +400,10 @@ export const PARTY_TEMPLATES: Record<string, Partial<PartyPlan>> = {
   }
 };
 
-export function createPartyFromTemplate(templateKey: string): PartyPlan {
-  const tmpl = PARTY_TEMPLATES[templateKey] || PARTY_TEMPLATES.taco_fiesta;
+export function createPartyFromTemplate(templateKey: string = 'tropical_birthday'): PartyPlan {
+  const tmpl = PARTY_TEMPLATES[templateKey] || PARTY_TEMPLATES.tropical_birthday || PARTY_TEMPLATES.taco_fiesta;
   const details = {
-    ...PARTY_TEMPLATES.taco_fiesta.details!,
+    ...PARTY_TEMPLATES.tropical_birthday.details!,
     ...tmpl.details,
     id: `party_${Date.now()}`
   };

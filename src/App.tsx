@@ -28,7 +28,7 @@ import { AIAssistantDrawer } from './components/AIAssistantDrawer';
 import { NewPartyModal } from './components/NewPartyModal';
 import { PrintView } from './components/PrintView';
 
-const STORAGE_KEY = 'cymbalmart_party_plan_v2';
+const STORAGE_KEY = 'cymbalmart_tropical_birthday_v1';
 
 export default function App() {
   const [currentPlan, setCurrentPlan] = useState<PartyPlan>(() => {
@@ -38,7 +38,7 @@ export default function App() {
     } catch (e) {
       console.warn('Failed to load saved party plan:', e);
     }
-    return createPartyFromTemplate('taco_fiesta');
+    return createPartyFromTemplate('tropical_birthday');
   });
 
   // Default active tab to review if plan exists, or define if host wants fresh start
