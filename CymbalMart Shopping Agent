@@ -1,0 +1,51 @@
+# CymbalMart Shopping Agent
+
+## Application Overview
+- **Name**: CymbalMart Shopping Agent
+- **Target User**: Busy hosts needing event planning.
+- **Primary Goal**: Convert intent into a curated, budget-conscious shopping list.
+
+---
+
+## Critical User Journey (CUJ) & Tasks
+
+### Task 1: Define Event
+- **Objective**: Convert host event intent into calculated food, drink, and supply needs.
+- **Parameters**:
+  - Party Type: Dinner Party Soirée, Backyard BBQ & Grill, Street Taco Fiesta, Cocktail & Tapas Bar, Birthday Celebration, Game Day Tailgate, Sunday Brunch Buffet, Kids & Family Party.
+  - Theme & Vibe: Custom theme title, atmosphere keywords, signature drink styles.
+  - Budget: Total budget limit ($ USD) with instant per-guest budget calculations.
+  - Guest Count: Breakdown of adult guests (21+) and kids (<21), event duration in hours.
+  - Special Requests: Dietary restrictions checklist (Gluten-Free, Vegetarian, Vegan, Nut-Free, Dairy-Free, Low Sugar, Eco-Friendly) and freeform host instructions (e.g., compostable bamboo tableware, party ice reserves, kid-friendly drinks).
+- **Component**: `src/components/DefineEventTab.tsx`
+- **Backend API**: `POST /api/plan/generate`
+
+### Task 2: Review List
+- **Objective**: Align items with the total budget and organize by CymbalMart store aisles.
+- **Features**:
+  - Live Budget Alignment Meter: Real-time calculation of total spend vs. budget limit with under/over-budget status indicators.
+  - 1-Click "Auto-Align to Budget": Algorithmic and AI-driven optimization that replaces brand-name goods with "CymbalMart Select" private label equivalents (saving 20–30%) and rightsizes portion quantities to meet budget ceilings.
+  - Store Aisle Routing: Categorized by CymbalMart Supercenter & Fresh Market departments (Produce, Butcher & Seafood, Deli & Cheese, Bakery, Snack Pantry, Beverage, Alcohol, Party Ice, Tableware).
+  - Item Management: In-cart purchase checkboxes, quantity adjustments with dynamic pricing, custom item additions, and removal.
+- **Component**: `src/components/ReviewListTab.tsx`
+- **Backend API**: `POST /api/plan/align-budget`
+
+### Task 3: Refine & Checkout
+- **Objective**: Adjust for host constraints, verify portion benchmarks, and finalize fulfillment order.
+- **Features**:
+  - Constraint Adjustments: 1-click dietary and supply adaptations (100% Gluten-Free compliance, Plant-Based/Vegan alternates, Maximize CymbalMart Select savings, and Extra Chilling Party Ice).
+  - Portion Verification: Benchmark verification for total drinks, beers, wine bottles, ice pounds, appetizer pieces, and protein pounds.
+  - CymbalMart Fulfillment Options:
+    - Curbside Express Pickup (Free, dedicated pickup bays, choose store location and pickup window).
+    - CymbalMart Same-Day Delivery (Refrigerated vans for cold items and ice).
+  - Order Finalization: Generates order confirmation with unique order number (`#CYMBAL-MART-XXXXXX`), digital barcode, printable receipt, and co-host share link.
+- **Component**: `src/components/RefineCheckoutTab.tsx`
+- **Backend API**: `POST /api/checkout`
+
+---
+
+## Technical Stack & Architecture
+- **Frontend**: React 19, TypeScript, Vite, Tailwind CSS, Lucide Icons, Canvas Confetti.
+- **Backend**: Express on Node.js with Gemini 2.5 Flash (`@google/genai`).
+- **State Management**: Reactive local state with LocalStorage persistence and automated quantity synchronizer.
+- **Execution Port**: 3000
