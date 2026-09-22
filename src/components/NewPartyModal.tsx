@@ -2,15 +2,14 @@ import React, { useState } from 'react';
 import { 
   X, 
   Sparkles, 
-  PartyPopper, 
   Users, 
   Clock, 
   DollarSign, 
   Wine, 
-  Flame, 
   ChefHat,
   Loader2,
-  CheckCircle
+  Store,
+  Check
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { PartyDetails, PartyPlan } from '../types/party';
@@ -35,12 +34,13 @@ export const NewPartyModal: React.FC<NewPartyModalProps> = ({
   const [themePrompt, setThemePrompt] = useState('');
   const [eventType, setEventType] = useState('Dinner & Cocktails Party');
   const [adults, setAdults] = useState(14);
-  const [kids, setKids] = useState(0);
+  const [kids, setKids] = useState(2);
   const [duration, setDuration] = useState(4);
-  const [budget, setBudget] = useState(250);
+  const [budget, setBudget] = useState(260);
   const [drinkStyle, setDrinkStyle] = useState<'full_bar' | 'beer_wine_only' | 'cocktail_special' | 'mocktails_only' | 'byob'>('cocktail_special');
   const [cateringStyle, setCateringStyle] = useState<'homemade' | 'semi_homemade' | 'store_bought' | 'bbq_grill'>('semi_homemade');
   const [selectedDietary, setSelectedDietary] = useState<string[]>(['Gluten-Free Friendly']);
+  const [specialRequests, setSpecialRequests] = useState('');
 
   if (!isOpen) return null;
 
@@ -48,9 +48,10 @@ export const NewPartyModal: React.FC<NewPartyModalProps> = ({
     'Gluten-Free Friendly',
     'Vegetarian Option',
     'Vegan Option',
-    'Nut-Free Alert',
+    'Nut-Free Safe',
     'Dairy-Free Option',
     'Kid-Friendly',
+    'Eco-Friendly Tableware',
   ];
 
   const toggleDietary = (item: string) => {
@@ -76,7 +77,7 @@ export const NewPartyModal: React.FC<NewPartyModalProps> = ({
 
     const partyDetails: PartyDetails = {
       id: `party_${Date.now()}`,
-      title: title.trim() || 'Custom Celebration',
+      title: title.trim() || 'CymbalMart Celebration',
       theme: themePrompt.trim() || 'Festive and memorable party',
       eventType,
       guestCountAdults: adults,
@@ -86,6 +87,7 @@ export const NewPartyModal: React.FC<NewPartyModalProps> = ({
       drinkStyle,
       cateringStyle,
       dietaryRestrictions: selectedDietary,
+      specialRequests: specialRequests.trim(),
     };
 
     try {
@@ -110,7 +112,6 @@ export const NewPartyModal: React.FC<NewPartyModalProps> = ({
       onClose();
     } catch (err) {
       console.error('Failed to generate plan:', err);
-      // Fallback
       const fallback = createPartyFromTemplate('taco_fiesta');
       fallback.details = partyDetails;
       onPlanCreated(fallback);
@@ -126,15 +127,15 @@ export const NewPartyModal: React.FC<NewPartyModalProps> = ({
         {/* Header */}
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-linear-to-tr from-rose-500 to-amber-500 flex items-center justify-center text-white shadow-md shadow-rose-500/20">
-              <PartyPopper className="w-5 h-5" />
+            <div className="w-10 h-10 rounded-2xl bg-teal-600 flex items-center justify-center text-white shadow-md shadow-teal-600/20">
+              <Store className="w-5 h-5" />
             </div>
             <div>
               <h2 className="font-heading font-extrabold text-xl text-slate-900">
-                Plan a New Party
+                Plan a New Party with CymbalMart
               </h2>
               <p className="text-xs text-slate-500">
-                Generate a custom shopping list, cocktail ratios, and timeline with Gemini AI.
+                Define your event to get a curated, budget-conscious shopping list and aisle schedule.
               </p>
             </div>
           </div>
@@ -153,75 +154,72 @@ export const NewPartyModal: React.FC<NewPartyModalProps> = ({
             type="button"
             onClick={() => setMode('ai')}
             className={`flex-1 py-2 rounded-lg flex items-center justify-center gap-2 transition-all ${
-              mode === 'ai' ? 'bg-white text-indigo-950 shadow-xs' : 'text-slate-600'
+              mode === 'ai' ? 'bg-white text-teal-900 shadow-xs' : 'text-slate-600'
             }`}
           >
-            <Sparkles className="w-4 h-4 text-indigo-600" />
+            <Sparkles className="w-4 h-4 text-teal-600" />
             <span>AI Custom Generator</span>
           </button>
           <button
             type="button"
             onClick={() => setMode('template')}
             className={`flex-1 py-2 rounded-lg flex items-center justify-center gap-2 transition-all ${
-              mode === 'template' ? 'bg-white text-indigo-950 shadow-xs' : 'text-slate-600'
+              mode === 'template' ? 'bg-white text-teal-900 shadow-xs' : 'text-slate-600'
             }`}
           >
-            <PartyPopper className="w-4 h-4 text-amber-500" />
-            <span>Instant Party Templates</span>
+            <Store className="w-4 h-4 text-teal-600" />
+            <span>Instant CymbalMart Blueprints</span>
           </button>
         </div>
 
         {mode === 'template' ? (
           /* TEMPLATE PICKER */
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            {/* Taco Fiesta */}
             <div
               onClick={() => handlePickTemplate('taco_fiesta')}
-              className="p-4 rounded-2xl border-2 border-slate-200 hover:border-amber-500 bg-linear-to-b from-amber-50/50 to-white cursor-pointer transition-all hover:shadow-md group"
+              className="p-4 rounded-2xl border-2 border-slate-200 hover:border-teal-500 bg-linear-to-b from-teal-50/50 to-white cursor-pointer transition-all hover:shadow-md group"
             >
               <div className="text-2xl mb-2">🌮</div>
-              <h4 className="font-heading font-bold text-sm text-slate-900 group-hover:text-amber-600">
-                Taco & Margarita Fiesta
+              <h4 className="font-heading font-bold text-sm text-slate-900 group-hover:text-teal-700">
+                Street Taco Cantina
               </h4>
               <p className="text-xs text-slate-500 mt-1 line-clamp-2">
-                Slow-braised carnitas, fresh guac bar, and batch lime margaritas for 16-18 guests.
+                Carnitas, corn tortillas, fresh guac, salsa bar & pitcher margaritas.
               </p>
-              <div className="mt-3 text-[11px] font-semibold text-amber-700 bg-amber-100/70 px-2 py-0.5 rounded-md w-fit">
-                ~$280 Est. Budget
+              <div className="mt-3 text-[11px] font-semibold text-teal-700 bg-teal-100/70 px-2 py-0.5 rounded-md w-fit">
+                $280 Budget · 18 Guests
               </div>
             </div>
 
-            {/* Backyard BBQ */}
             <div
               onClick={() => handlePickTemplate('backyard_bbq')}
-              className="p-4 rounded-2xl border-2 border-slate-200 hover:border-red-500 bg-linear-to-b from-red-50/50 to-white cursor-pointer transition-all hover:shadow-md group"
+              className="p-4 rounded-2xl border-2 border-slate-200 hover:border-teal-500 bg-linear-to-b from-amber-50/50 to-white cursor-pointer transition-all hover:shadow-md group"
             >
-              <div className="text-2xl mb-2">🍔</div>
-              <h4 className="font-heading font-bold text-sm text-slate-900 group-hover:text-red-600">
-                Smokehouse Backyard BBQ
+              <div className="text-2xl mb-2">🥩</div>
+              <h4 className="font-heading font-bold text-sm text-slate-900 group-hover:text-teal-700">
+                Smokehouse Cookout
               </h4>
               <p className="text-xs text-slate-500 mt-1 line-clamp-2">
-                Smash burgers, grilled brats, watermelon, potato salad, and craft IPA coolers.
+                Angus beef smash burgers, smoked brats, watermelon, corn & craft IPAs.
               </p>
-              <div className="mt-3 text-[11px] font-semibold text-red-700 bg-red-100/70 px-2 py-0.5 rounded-md w-fit">
-                ~$340 Est. Budget
+              <div className="mt-3 text-[11px] font-semibold text-amber-700 bg-amber-100/70 px-2 py-0.5 rounded-md w-fit">
+                $330 Budget · 26 Guests
               </div>
             </div>
 
-            {/* Wine & Tapas */}
             <div
               onClick={() => handlePickTemplate('wine_tapas')}
-              className="p-4 rounded-2xl border-2 border-slate-200 hover:border-pink-500 bg-linear-to-b from-pink-50/50 to-white cursor-pointer transition-all hover:shadow-md group"
+              className="p-4 rounded-2xl border-2 border-slate-200 hover:border-teal-500 bg-linear-to-b from-purple-50/50 to-white cursor-pointer transition-all hover:shadow-md group"
             >
               <div className="text-2xl mb-2">🍷</div>
-              <h4 className="font-heading font-bold text-sm text-slate-900 group-hover:text-pink-600">
-                Spanish Tapas & Wine
+              <h4 className="font-heading font-bold text-sm text-slate-900 group-hover:text-teal-700">
+                Mediterranean Wine & Tapas
               </h4>
               <p className="text-xs text-slate-500 mt-1 line-clamp-2">
-                Jamón Serrano, aged Manchego, pan con tomate, Rioja reds, and chilled Cava.
+                Cured charcuterie, aged Manchego, pan con tomate, Rioja & Spanish Cava.
               </p>
-              <div className="mt-3 text-[11px] font-semibold text-pink-700 bg-pink-100/70 px-2 py-0.5 rounded-md w-fit">
-                ~$260 Est. Budget
+              <div className="mt-3 text-[11px] font-semibold text-purple-700 bg-purple-100/70 px-2 py-0.5 rounded-md w-fit">
+                $250 Budget · 12 Guests
               </div>
             </div>
           </div>
@@ -231,53 +229,53 @@ export const NewPartyModal: React.FC<NewPartyModalProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
               <div>
                 <label className="block font-bold text-slate-700 mb-1">
-                  Party Name / Occasion *
+                  Event Name / Occasion *
                 </label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Leo's 30th Birthday Bash"
+                  placeholder="e.g. Sam's 30th Birthday Cookout"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-teal-500"
                 />
               </div>
 
               <div>
                 <label className="block font-bold text-slate-700 mb-1">
-                  Event Style
+                  Party Type
                 </label>
                 <select
                   value={eventType}
                   onChange={(e) => setEventType(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 font-medium"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-teal-500 font-medium"
                 >
                   <option value="Dinner & Cocktails Party">Dinner & Cocktails Party</option>
-                  <option value="Cocktail & Hors d'Oeuvres Soiree">Cocktail & Hors d'Oeuvres Soiree</option>
                   <option value="Outdoor BBQ Cookout">Outdoor BBQ Cookout</option>
-                  <option value="Birthday Party Celebration">Birthday Party Celebration</option>
-                  <option value="Game Night & Snack Attack">Game Night & Snack Attack</option>
-                  <option value="Sunday Brunch & Mimosas">Sunday Brunch & Mimosas</option>
+                  <option value="Street Taco Fiesta">Street Taco Fiesta</option>
+                  <option value="Cocktail & Tapas Soiree">Cocktail & Tapas Soiree</option>
+                  <option value="Birthday Celebration">Birthday Celebration</option>
+                  <option value="Game Day & Tailgate">Game Day & Tailgate</option>
+                  <option value="Sunday Brunch Buffet">Sunday Brunch Buffet</option>
                 </select>
               </div>
 
               <div className="sm:col-span-2">
                 <label className="block font-bold text-slate-700 mb-1">
-                  Theme, Vibe & Food Prompt (Tell Festivity What You Want)
+                  Custom Theme or Signature Food/Vibe Request
                 </label>
                 <textarea
                   rows={2}
-                  placeholder="e.g. Tropical Hawaiian Luau with slow cooker Kalua pork, pineapple fried rice, Mai Tai rum punch, and tiki decorations."
+                  placeholder="e.g. Tropical Tiki with coconut rum punch, glazed pineapple sliders, and Hawaiian coleslaw."
                   value={themePrompt}
                   onChange={(e) => setThemePrompt(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-teal-500"
                 />
               </div>
 
-              {/* Guests & Budget Row */}
               <div>
                 <label className="block font-bold text-slate-700 mb-1">
-                  Adults: <strong className="text-indigo-600">{adults}</strong> | Kids: <strong className="text-amber-600">{kids}</strong>
+                  Adults: <strong className="text-teal-700">{adults}</strong> | Kids: <strong className="text-amber-700">{kids}</strong>
                 </label>
                 <div className="flex gap-2">
                   <input
@@ -303,55 +301,35 @@ export const NewPartyModal: React.FC<NewPartyModalProps> = ({
 
               <div>
                 <label className="block font-bold text-slate-700 mb-1">
-                  Budget Target ($ USD)
+                  Target Budget ($ USD)
                 </label>
                 <input
                   type="number"
-                  min="50"
+                  min="40"
                   max="5000"
                   step="10"
                   value={budget}
                   onChange={(e) => setBudget(Number(e.target.value))}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-semibold"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-bold text-slate-900"
                 />
               </div>
 
-              <div>
+              <div className="sm:col-span-2">
                 <label className="block font-bold text-slate-700 mb-1">
-                  Drink Format
+                  Special Requests (compostable plates, cooler ice, kids punch)
                 </label>
-                <select
-                  value={drinkStyle}
-                  onChange={(e) => setDrinkStyle(e.target.value as any)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl"
-                >
-                  <option value="cocktail_special">Signature Batch Cocktail & Beer</option>
-                  <option value="full_bar">Full Bar (Spirits, Wine & Beer)</option>
-                  <option value="beer_wine_only">Beer & Wine Only</option>
-                  <option value="mocktails_only">Zero-Proof / Mocktails</option>
-                  <option value="byob">BYOB (Host provides mixers/ice)</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">
-                  Food Preparation Style
-                </label>
-                <select
-                  value={cateringStyle}
-                  onChange={(e) => setCateringStyle(e.target.value as any)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl"
-                >
-                  <option value="semi_homemade">Semi-Homemade (Store shortcuts + fresh mains)</option>
-                  <option value="homemade">100% Homemade from Scratch</option>
-                  <option value="store_bought">Zero Cook / Store-Bought Platters</option>
-                  <option value="bbq_grill">Outdoor BBQ & Smoker</option>
-                </select>
+                <input
+                  type="text"
+                  value={specialRequests}
+                  onChange={(e) => setSpecialRequests(e.target.value)}
+                  placeholder="e.g. Include 100% compostable bamboo plates, lots of ice bags, and kid juices"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-teal-500"
+                />
               </div>
 
               <div className="sm:col-span-2">
                 <label className="block font-bold text-slate-700 mb-1.5">
-                  Dietary Tags & Accommodations
+                  Dietary Accommodations
                 </label>
                 <div className="flex flex-wrap gap-1.5">
                   {dietaryOptions.map((opt) => (
@@ -361,7 +339,7 @@ export const NewPartyModal: React.FC<NewPartyModalProps> = ({
                       onClick={() => toggleDietary(opt)}
                       className={`px-2.5 py-1 rounded-full text-[11px] font-medium transition-all ${
                         selectedDietary.includes(opt)
-                          ? 'bg-indigo-600 text-white shadow-xs'
+                          ? 'bg-teal-600 text-white shadow-xs'
                           : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                       }`}
                     >
@@ -376,17 +354,17 @@ export const NewPartyModal: React.FC<NewPartyModalProps> = ({
               <button
                 type="submit"
                 disabled={isGenerating}
-                className="w-full py-3 bg-linear-to-r from-rose-500 via-amber-500 to-indigo-600 hover:from-rose-600 hover:to-indigo-700 disabled:opacity-50 text-white font-extrabold text-sm rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/20 transition-all active:scale-[0.99]"
+                className="w-full py-3 bg-linear-to-r from-teal-600 to-indigo-700 hover:from-teal-700 hover:to-indigo-800 disabled:opacity-50 text-white font-extrabold text-sm rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-teal-700/20 transition-all active:scale-[0.99]"
               >
                 {isGenerating ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
-                    <span>Festivity Agent is Generating Your Plan & Shopping Route...</span>
+                    <span>CymbalMart Agent is Curating Your Shopping List...</span>
                   </>
                 ) : (
                   <>
-                    <Sparkles className="w-5 h-5" />
-                    <span>Synthesize Complete Party Shopping Plan</span>
+                    <Sparkles className="w-5 h-5 text-teal-200" />
+                    <span>Generate Curated CymbalMart Plan</span>
                   </>
                 )}
               </button>

@@ -11,7 +11,8 @@ import {
   ArrowRight,
   Check,
   ShoppingBag,
-  Loader2
+  Loader2,
+  Store
 } from 'lucide-react';
 import { PartyPlan, ShoppingItem, ChatMessage } from '../types/party';
 
@@ -34,19 +35,20 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
     {
       id: 'welcome',
       sender: 'agent',
-      text: `Hello! I'm Festivity, your Party Planner Shopping Agent. I'm actively reviewing your **${currentPlan.themeTitle || currentPlan.details.title}** plan.
-
-Ask me to:
-• Suggest signature cocktail or mocktail batch recipes
-• Find swaps to cut $30-$50 from your budget
-• Recommend zero-cook Trader Joe's or Costco appetizers
-• Add specific ingredients or convert recipes into shopping items!`,
+      text: `Hello! I'm the **CymbalMart Shopping Agent**. I'm actively reviewing your **${currentPlan.themeTitle || currentPlan.details.title}** plan.
+      
+Ask me anything:
+• "How can I cut $25 from this cart to meet my budget?"
+• "Suggest a signature cocktail recipe for ${currentPlan.details.guestCountAdults} guests"
+• "Make this list 100% Gluten-Free or add vegan snacks"
+• "Swap name brands to CymbalMart Select for 20% savings"
+• "Convert a family recipe into CymbalMart grocery items"`,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       suggestedPrompts: [
-        'How can I cut $35 from this list?',
+        'How can I cut $25 from my cart?',
+        'Swap to CymbalMart Select brand picks',
         'Batch cocktail recipe for 16 guests',
-        'Add gluten-free finger food items',
-        'Recommend store-bought Costco appetizers',
+        'Add gluten-free appetizer options',
       ],
     },
   ]);
@@ -103,7 +105,7 @@ Ask me to:
       const agentMsg: ChatMessage = {
         id: `agent_${Date.now()}`,
         sender: 'agent',
-        text: data.text || 'I analyzed your request. Here are my recommendations!',
+        text: data.text || 'I analyzed your CymbalMart cart. Here are my recommendations!',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         suggestedPrompts: data.suggestedPrompts || [],
         itemModifications: data.itemModifications,
@@ -115,7 +117,7 @@ Ask me to:
       const errorMsg: ChatMessage = {
         id: `agent_err_${Date.now()}`,
         sender: 'agent',
-        text: "I ran into a momentary connection hiccup, but you can adjust any item on the list directly or ask me again.",
+        text: "I'm ready to assist! You can adjust any item on the list directly or ask me another question about your party plan.",
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
       setMessages((prev) => [...prev, errorMsg]);
@@ -145,7 +147,7 @@ Ask me to:
         const confirmationMsg: ChatMessage = {
           id: `recipe_added_${Date.now()}`,
           sender: 'agent',
-          text: `Added **${data.items.length} ingredients** for "${recipeText}" (scaled for ${recipeServings} guests) directly into your shopping list!`,
+          text: `Added **${data.items.length} CymbalMart ingredients** for "${recipeText}" (scaled for ${recipeServings} guests) directly into your shopping cart!`,
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           itemModifications: {
             added: data.items,
@@ -169,13 +171,13 @@ Ask me to:
       {/* Header */}
       <div className="px-5 py-4 border-b border-slate-200/80 bg-slate-900 text-white flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-linear-to-tr from-violet-500 to-amber-500 flex items-center justify-center text-white shadow-xs">
-            <Bot className="w-4 h-4" />
+          <div className="w-8 h-8 rounded-lg bg-teal-600 flex items-center justify-center text-white shadow-xs">
+            <Store className="w-4 h-4" />
           </div>
           <div>
-            <h3 className="font-heading font-bold text-sm">Festivity Shopping Copilot</h3>
-            <span className="text-[10px] text-amber-300 font-medium">
-              Powered by Gemini 3.8
+            <h3 className="font-heading font-bold text-sm">CymbalMart Shopping Copilot</h3>
+            <span className="text-[10px] text-teal-300 font-medium">
+              Curated Event Intelligence
             </span>
           </div>
         </div>
@@ -196,8 +198,8 @@ Ask me to:
             activeMode === 'chat' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600'
           }`}
         >
-          <Bot className="w-3.5 h-3.5 text-violet-600" />
-          <span>Agent Assistant</span>
+          <Bot className="w-3.5 h-3.5 text-teal-600" />
+          <span>Shopping Assistant</span>
         </button>
         <button
           onClick={() => setActiveMode('recipe')}
@@ -206,7 +208,7 @@ Ask me to:
           }`}
         >
           <ChefHat className="w-3.5 h-3.5 text-amber-600" />
-          <span>Recipe to List</span>
+          <span>Recipe to Cart</span>
         </button>
       </div>
 
@@ -232,8 +234,8 @@ Ask me to:
 
                   {/* If the agent proposed item additions */}
                   {msg.itemModifications?.added && msg.itemModifications.added.length > 0 && (
-                    <div className="mt-3 pt-3 border-t border-slate-200/80 bg-white/80 p-2.5 rounded-xl text-slate-800 space-y-2">
-                      <div className="flex items-center justify-between text-[11px] font-bold text-indigo-900">
+                    <div className="mt-3 pt-3 border-t border-slate-200/80 bg-white/90 p-2.5 rounded-xl text-slate-800 space-y-2">
+                      <div className="flex items-center justify-between text-[11px] font-bold text-teal-900">
                         <span>Items to Add ({msg.itemModifications.added.length})</span>
                         <span>
                           ≈ $
@@ -254,10 +256,10 @@ Ask me to:
                       </div>
                       <button
                         onClick={() => onApplyAddedItems(msg.itemModifications!.added!)}
-                        className="w-full mt-1 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-lg flex items-center justify-center gap-1.5 transition-colors"
+                        className="w-full mt-1 py-1.5 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs rounded-lg flex items-center justify-center gap-1.5 transition-colors shadow-xs"
                       >
                         <Plus className="w-3.5 h-3.5" />
-                        <span>Add All to Shopping List</span>
+                        <span>Add All to CymbalMart Cart</span>
                       </button>
                     </div>
                   )}
@@ -270,7 +272,7 @@ Ask me to:
                       <button
                         key={pIdx}
                         onClick={() => handleSendMessage(prompt)}
-                        className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200/70 transition-colors text-left"
+                        className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-200 transition-colors text-left"
                       >
                         {prompt}
                       </button>
@@ -286,8 +288,8 @@ Ask me to:
 
             {isLoading && (
               <div className="flex items-center gap-2 text-xs text-slate-500 bg-slate-50 p-3 rounded-xl w-fit">
-                <Loader2 className="w-4 h-4 animate-spin text-indigo-600" />
-                <span>Festivity is planning...</span>
+                <Loader2 className="w-4 h-4 animate-spin text-teal-600" />
+                <span>CymbalMart Agent is planning...</span>
               </div>
             )}
             <div ref={messagesEndRef} />
@@ -304,15 +306,15 @@ Ask me to:
             >
               <input
                 type="text"
-                placeholder="Ask Festivity or request an item..."
+                placeholder="Ask CymbalMart Agent or request an item..."
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
-                className="flex-1 px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
+                className="flex-1 px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-teal-500"
               />
               <button
                 type="submit"
                 disabled={!inputMessage.trim() || isLoading}
-                className="p-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-xl transition-colors shrink-0"
+                className="p-2 bg-teal-600 hover:bg-teal-700 disabled:opacity-50 text-white rounded-xl transition-colors shrink-0"
               >
                 <Send className="w-4 h-4" />
               </button>
@@ -324,10 +326,10 @@ Ask me to:
         <div className="flex-1 p-5 space-y-4 overflow-y-auto">
           <div>
             <h4 className="font-heading font-bold text-sm text-slate-900">
-              Recipe to Grocery List Converter
+              Recipe to CymbalMart Cart Converter
             </h4>
             <p className="text-xs text-slate-500 mt-1">
-              Paste any party dish, cocktail, or recipe. Gemini will scale ingredients for your guest count and add them to your shopping list with store tags!
+              Paste any party dish, cocktail, or recipe. The agent will scale ingredients for your guest count and add them to your cart with CymbalMart aisle tags!
             </p>
           </div>
 
@@ -342,7 +344,7 @@ Ask me to:
                 placeholder="e.g. Classic Mexican Street Corn Dip (Elote) with cotija cheese, roasted corn, lime, cilantro, and chili powder"
                 value={recipeText}
                 onChange={(e) => setRecipeText(e.target.value)}
-                className="w-full p-3 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-amber-500"
+                className="w-full p-3 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500"
               />
             </div>
 
@@ -363,7 +365,7 @@ Ask me to:
             <button
               type="submit"
               disabled={isConvertingRecipe || !recipeText.trim()}
-              className="w-full py-2.5 bg-linear-to-r from-amber-500 to-rose-500 hover:from-amber-600 hover:to-rose-600 disabled:opacity-50 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 shadow-sm transition-all"
+              className="w-full py-2.5 bg-linear-to-r from-teal-600 to-indigo-700 hover:from-teal-700 hover:to-indigo-800 disabled:opacity-50 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 shadow-sm transition-all"
             >
               {isConvertingRecipe ? (
                 <>
@@ -373,7 +375,7 @@ Ask me to:
               ) : (
                 <>
                   <ChefHat className="w-4 h-4" />
-                  <span>Convert & Add to Shopping List</span>
+                  <span>Convert & Add to CymbalMart Cart</span>
                 </>
               )}
             </button>
@@ -384,10 +386,10 @@ Ask me to:
             <p className="text-xs font-bold text-slate-600 mb-2">Popular Party Additions:</p>
             <div className="space-y-1.5">
               {[
-                'Aperol Spritz Batch (Aperol, Prosecco, Soda, Oranges)',
-                'Caprese Skewers with Balsamic Glaze',
+                'Fresh Guacamole & Roasted Tomato Salsa with Corn Tortilla Chips',
+                'Caprese Skewers with Sweet Basil & Aged Balsamic Glaze',
                 'Warm Artichoke & Spinach Dip with Pita Chips',
-                'Mini Pulled Pork Sliders with Pickles',
+                'Mini Angus Beef Sliders with Brioche Buns & Pickles',
               ].map((rec, i) => (
                 <button
                   key={i}

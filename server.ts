@@ -28,7 +28,7 @@ const ai = new GoogleGenAI({
   },
 });
 
-// Helper for fallback fallback generation when API key is not configured or in offline mode
+// Helper for fallback generation when API key is not configured or in offline mode
 function generateFallbackPlan(details: PartyDetails, customIdea?: string): PartyPlan {
   const baseTemplateKey = details.eventType?.toLowerCase().includes('bbq')
     ? 'backyard_bbq'
@@ -40,14 +40,14 @@ function generateFallbackPlan(details: PartyDetails, customIdea?: string): Party
   base.details = { ...base.details, ...details, id: details.id || `party_${Date.now()}` };
   if (customIdea) {
     base.themeTitle = `${details.title || customIdea}`;
-    base.themeDescription = `Tailored party plan designed for ${details.guestCountAdults} adults & ${details.guestCountKids || 0} kids. ${customIdea}`;
+    base.themeDescription = `Curated CymbalMart party plan for ${details.guestCountAdults} adults & ${details.guestCountKids || 0} kids. ${customIdea}`;
   }
   base.drinkCalc = calculatePartyDrinks(base.details);
   base.foodCalc = calculatePartyFood(base.details);
   return base;
 }
 
-// 1. Generate Party Plan & Shopping List Endpoint
+// 1. Generate Party Plan & Shopping List Endpoint (Task 1: Define Event -> Curated List)
 app.post('/api/plan/generate', async (req, res) => {
   try {
     const { details, customIdea } = req.body as { details: PartyDetails; customIdea?: string };
@@ -60,43 +60,50 @@ app.post('/api/plan/generate', async (req, res) => {
     const foodCalc = calculatePartyFood(details);
 
     if (!process.env.GEMINI_API_KEY) {
-      console.log('No GEMINI_API_KEY detected, using intelligent algorithmic generator.');
+      console.log('No GEMINI_API_KEY detected, using CymbalMart intelligent algorithmic generator.');
       const fallback = generateFallbackPlan(details, customIdea);
       return res.json(fallback);
     }
 
-    const prompt = `You are Festivity, an elite Master Party Planner and Grocery Shopping Concierge.
-Generate a comprehensive, realistic, and budget-conscious party shopping plan for the following event:
-- Title/Occasion: ${details.title || 'Celebration'}
-- Custom Theme/Vibe Prompt: ${customIdea || details.theme || 'Festive and memorable'}
-- Event Type: ${details.eventType || 'Dinner & Drinks'}
+    const prompt = `You are the CymbalMart Shopping Agent, Google Cloud retail's premier AI party planner and grocery concierge.
+Your mission is to convert a busy host's event intent into a curated, budget-conscious CymbalMart shopping list and fulfillment plan.
+
+Event Profile:
+- Party Type: ${details.eventType || 'Dinner & Drinks'}
+- Theme/Occasion: ${details.title || 'Celebration'}
+- Custom Theme/Vibe Notes: ${customIdea || details.theme || 'Festive and memorable'}
 - Adult Guests: ${details.guestCountAdults || 12}
 - Kid Guests: ${details.guestCountKids || 0}
 - Duration: ${details.durationHours || 4} hours
-- Target Budget: $${details.budgetLimit || 250} USD
+- Target Total Budget: $${details.budgetLimit || 250} USD (CRITICAL: Total estimated price of essential + recommended items MUST be close to or under $${details.budgetLimit || 250}!)
 - Drink Format: ${details.drinkStyle || 'full_bar'}
-- Food Prep Style: ${details.cateringStyle || 'semi_homemade'}
-- Dietary Needs: ${(details.dietaryRestrictions || []).join(', ') || 'None specified'}
+- Prep Style: ${details.cateringStyle || 'semi_homemade'}
+- Dietary Restrictions: ${(details.dietaryRestrictions || []).join(', ') || 'None specified'}
+- Special Requests: ${details.specialRequests || 'None specified'}
 
 Pre-calculated Benchmarks:
 - Estimated Total Drinks: ${drinkCalc.totalDrinks} drinks (${drinkCalc.beerBottles} beers, ${drinkCalc.wineBottles} wine bottles, ${drinkCalc.liquorBottles750ml} liquor bottles 750ml, ${drinkCalc.iceLbs} lbs ice)
 - Food Portions: ${foodCalc.appetizerPieces} appetizer bites, ${foodCalc.proteinLbs} lbs protein, ${foodCalc.dessertPieces} desserts.
 
-Generate a complete, cohesive, realistic shopping list. Assign items to practical, popular grocery stores:
-- 'Costco / Wholesale' for bulk meats, ice, cups, paper towels, snacks, cases of beer
-- 'Trader Joe’s' for cheeses, charcuterie, dips, specialty appetizers, wines
-- 'Target' for decor, napkins, candles, tableware
-- 'Local Supermarket' for fresh herbs, produce, citrus, bakery
-- 'Liquor Store' for spirits, bitters, craft alcohol
-- 'Bakery / Specialty' for specialty cakes or breads
-
-Ensure accurate item quantities and realistic USD pricing that aligns closely with the user's budget!`;
+Requirements:
+1. Provide a tailored theme title, description, and 3-5 vibe keywords.
+2. Provide a signature cocktail and kid/non-drinker mocktail.
+3. Generate a structured list of 16-24 grocery and party items.
+4. Assign items to CymbalMart store formats:
+   - 'CymbalMart Supercenter' (pantry, meats, paper goods, bulk snacks)
+   - 'CymbalMart Fresh Market' (fresh produce, artisan cheeses, bakery)
+   - 'CymbalMart Wine & Spirits' (beer, wine, liquor)
+   - 'CymbalMart Wholesale Club' (bulk ice, large packs)
+5. Identify budget-saving items with 'isCymbalMartBrand: true' (brandName: "CymbalMart Select", "CymbalMart Butcher Select", "CymbalMart Organics", "CymbalMart Bakery", or "CymbalMart Earth First").
+6. Provide specific aisle numbers (e.g. "Aisle 1", "Aisle 4 - Butcher", "Aisle 8 - Freezers").
+7. Provide actionable CymbalMart cost-saving tips to keep the host on budget.
+8. Provide a timeline with prep phases and a day-of Run of Show.`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-3.8-flash',
+      model: 'gemini-2.5-flash',
       contents: prompt,
       config: {
-        systemInstruction: 'You are a professional party planner and culinary procurement agent. Always return structured, actionable party plans in valid JSON matching the schema.',
+        systemInstruction: 'You are the CymbalMart Shopping Agent. Always output valid JSON strictly matching the requested schema. Ensure realistic prices in USD that align with the user budget.',
         responseMimeType: 'application/json',
         responseSchema: {
           type: Type.OBJECT,
@@ -146,13 +153,16 @@ Ensure accurate item quantities and realistic USD pricing that aligns closely wi
                   estimatedPrice: { type: Type.NUMBER },
                   store: {
                     type: Type.STRING,
-                    description: 'One of: Costco / Wholesale, Trader Joe’s, Target, Local Supermarket, Liquor Store, Amazon / Online, Bakery / Specialty, Other',
+                    description: 'One of: CymbalMart Supercenter, CymbalMart Fresh Market, CymbalMart Wine & Spirits, CymbalMart Wholesale Club, CymbalMart Express',
                   },
                   priority: {
                     type: Type.STRING,
                     description: 'essential, recommended, or optional',
                   },
                   notes: { type: Type.STRING },
+                  isCymbalMartBrand: { type: Type.BOOLEAN },
+                  brandName: { type: Type.STRING },
+                  aisleNumber: { type: Type.STRING },
                 },
                 required: ['name', 'category', 'quantity', 'unit', 'estimatedPrice', 'store', 'priority'],
               },
@@ -211,10 +221,13 @@ Ensure accurate item quantities and realistic USD pricing that aligns closely wi
       quantity: Number(it.quantity) || 1,
       unit: it.unit || 'units',
       estimatedPrice: Number(it.estimatedPrice) || 5,
-      store: it.store || 'Local Supermarket',
+      store: it.store || 'CymbalMart Supercenter',
       priority: it.priority || 'essential',
       notes: it.notes || '',
       isBought: false,
+      isCymbalMartBrand: it.isCymbalMartBrand ?? true,
+      brandName: it.brandName || (it.isCymbalMartBrand ? 'CymbalMart Select' : undefined),
+      aisleNumber: it.aisleNumber || 'Aisle 1',
     }));
 
     const finalTimeline = (parsed.timeline || []).map((ph: any, pIdx: number) => ({
@@ -231,8 +244,8 @@ Ensure accurate item quantities and realistic USD pricing that aligns closely wi
     const plan: PartyPlan = {
       details: { ...details, id: details.id || `party_${Date.now()}` },
       themeTitle: parsed.themeTitle || details.title,
-      themeDescription: parsed.themeDescription || 'A handcrafted party plan.',
-      vibeKeywords: parsed.vibeKeywords || ['Festive', 'Welcoming'],
+      themeDescription: parsed.themeDescription || 'A handcrafted CymbalMart party plan.',
+      vibeKeywords: parsed.vibeKeywords || ['Festive', 'Budget-Smart', 'Delicious'],
       signatureCocktail: parsed.signatureCocktail,
       signatureMocktail: parsed.signatureMocktail,
       items: finalItems,
@@ -241,6 +254,12 @@ Ensure accurate item quantities and realistic USD pricing that aligns closely wi
       costSavingTips: parsed.costSavingTips || [],
       timeline: finalTimeline,
       runOfShow: parsed.runOfShow || [],
+      fulfillment: {
+        type: 'pickup',
+        storeLocation: 'CymbalMart Supercenter #101 - Metro Center',
+        slot: 'Party Day, 11:00 AM - 1:00 PM',
+        status: 'planning',
+      },
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
@@ -248,54 +267,215 @@ Ensure accurate item quantities and realistic USD pricing that aligns closely wi
     res.json(plan);
   } catch (err: any) {
     console.error('Error generating party plan with Gemini:', err);
-    // Graceful fallback so the UI never breaks
     const fallback = generateFallbackPlan(req.body.details, req.body.customIdea);
     res.json(fallback);
   }
 });
 
-// 2. Interactive Party Shopping Assistant Chat Endpoint
+// 2. Align List to Budget Endpoint (Task 2: Review List -> Align items with total budget)
+app.post('/api/plan/align-budget', async (req, res) => {
+  try {
+    const { items, budgetLimit, details } = req.body as { items: ShoppingItem[]; budgetLimit: number; details: PartyDetails };
+
+    if (!items || !budgetLimit) {
+      return res.status(400).json({ error: 'Items and budget limit are required.' });
+    }
+
+    const currentTotal = items.reduce((sum, i) => sum + (i.estimatedPrice || 0), 0);
+    if (currentTotal <= budgetLimit) {
+      return res.json({
+        items,
+        totalSavings: 0,
+        message: `Your shopping list is already within your $${budgetLimit} budget (Current: $${currentTotal.toFixed(2)}).`,
+        tips: ['Great job! You have remaining budget cushion for ice or extra drinks.'],
+      });
+    }
+
+    if (!process.env.GEMINI_API_KEY) {
+      // Algorithmic budget alignment fallback
+      let runningTotal = currentTotal;
+      const optimizedItems = items.map((item) => {
+        let price = item.estimatedPrice;
+        let isCymbalMart = item.isCymbalMartBrand;
+        let brand = item.brandName;
+        // Swap to CymbalMart Select for 20% discount if not already
+        if (!isCymbalMart && runningTotal > budgetLimit) {
+          const discount = Math.round(price * 0.22 * 100) / 100;
+          price = Math.max(1, price - discount);
+          runningTotal -= discount;
+          isCymbalMart = true;
+          brand = 'CymbalMart Select';
+        }
+        // Downsize optional items
+        if (item.priority === 'optional' && runningTotal > budgetLimit) {
+          const discount = Math.round(price * 0.4 * 100) / 100;
+          price = Math.max(2, price - discount);
+          runningTotal -= discount;
+        }
+        return {
+          ...item,
+          estimatedPrice: Math.round(price * 100) / 100,
+          isCymbalMartBrand: isCymbalMart,
+          brandName: brand,
+        };
+      });
+
+      const newTotal = optimizedItems.reduce((s, i) => s + i.estimatedPrice, 0);
+      return res.json({
+        items: optimizedItems,
+        totalSavings: Math.max(0, currentTotal - newTotal),
+        message: `Aligned list to budget by swapping items to CymbalMart Select brand and rightsizing portions! New total: $${newTotal.toFixed(2)} (Target: $${budgetLimit}).`,
+        tips: [
+          'Swapped brand-name items to CymbalMart Select private label.',
+          'Consolidated portion sizes to match exact guest headcounts.',
+        ],
+      });
+    }
+
+    const prompt = `You are the CymbalMart Shopping Agent's Budget Optimizer.
+Current Shopping List Total: $${currentTotal.toFixed(2)}
+Target Budget Ceiling: $${budgetLimit.toFixed(2)}
+Over-budget amount to trim: $${(currentTotal - budgetLimit).toFixed(2)}
+Guests: ${details?.guestCountAdults || 12} adults, ${details?.guestCountKids || 0} kids.
+
+Shopping List:
+${JSON.stringify(
+  items.map((i) => ({
+    id: i.id,
+    name: i.name,
+    category: i.category,
+    price: i.estimatedPrice,
+    quantity: i.quantity,
+    priority: i.priority,
+    isCymbalMartBrand: i.isCymbalMartBrand,
+  })),
+  null,
+  2
+)}
+
+Task:
+Adjust the prices, quantities, and brands so the NEW total is LESS THAN OR EQUAL to $${budgetLimit.toFixed(2)}.
+Techniques:
+1. Swap brand names to 'CymbalMart Select' or 'CymbalMart Butcher Select' for 20-30% savings.
+2. Trim optional/decor items or recommend bulk multi-packs.
+3. Adjust quantities to realistic portion needs without leaving guests hungry.
+Return the optimized item list and a short summary of how the budget was aligned.`;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+      config: {
+        responseMimeType: 'application/json',
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            items: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  id: { type: Type.STRING },
+                  name: { type: Type.STRING },
+                  category: { type: Type.STRING },
+                  quantity: { type: Type.NUMBER },
+                  unit: { type: Type.STRING },
+                  estimatedPrice: { type: Type.NUMBER },
+                  store: { type: Type.STRING },
+                  priority: { type: Type.STRING },
+                  notes: { type: Type.STRING },
+                  isCymbalMartBrand: { type: Type.BOOLEAN },
+                  brandName: { type: Type.STRING },
+                  aisleNumber: { type: Type.STRING },
+                },
+                required: ['id', 'name', 'estimatedPrice', 'quantity'],
+              },
+            },
+            message: { type: Type.STRING },
+            tips: {
+              type: Type.ARRAY,
+              items: { type: Type.STRING },
+            },
+          },
+          required: ['items', 'message', 'tips'],
+        },
+      },
+    });
+
+    const parsed = JSON.parse(response.text || '{}');
+    const optimizedItems: ShoppingItem[] = (parsed.items || []).map((it: any) => {
+      const orig = items.find((o) => o.id === it.id);
+      return {
+        id: it.id || `item_${Date.now()}`,
+        name: it.name || orig?.name || 'Item',
+        category: it.category || orig?.category || 'pantry_snacks',
+        quantity: Number(it.quantity) || orig?.quantity || 1,
+        unit: it.unit || orig?.unit || 'units',
+        estimatedPrice: Number(it.estimatedPrice) || orig?.estimatedPrice || 5,
+        store: it.store || orig?.store || 'CymbalMart Supercenter',
+        priority: it.priority || orig?.priority || 'essential',
+        notes: it.notes || orig?.notes || '',
+        isBought: orig?.isBought || false,
+        isCymbalMartBrand: it.isCymbalMartBrand ?? true,
+        brandName: it.brandName || 'CymbalMart Select',
+        aisleNumber: it.aisleNumber || orig?.aisleNumber || 'Aisle 1',
+      };
+    });
+
+    const newTotal = optimizedItems.reduce((s, i) => s + i.estimatedPrice, 0);
+    res.json({
+      items: optimizedItems,
+      totalSavings: Math.max(0, currentTotal - newTotal),
+      message: parsed.message || `Successfully aligned shopping list to your $${budgetLimit} budget!`,
+      tips: parsed.tips || ['Swapped items to CymbalMart Select for maximum value.'],
+    });
+  } catch (err: any) {
+    console.error('Budget alignment error:', err);
+    res.status(500).json({ error: 'Failed to align budget.' });
+  }
+});
+
+// 3. Interactive CymbalMart Shopping Agent Chat
 app.post('/api/chat', async (req, res) => {
   try {
-    const { message, history, currentPlan } = req.body;
+    const { message, currentPlan } = req.body;
 
     if (!message) {
       return res.status(400).json({ error: 'Message is required.' });
     }
 
     if (!process.env.GEMINI_API_KEY) {
-      // Offline fallback conversational responses
       return res.json({
-        text: `I'm here to help manage your party plan! You can ask me to swap items, suggest cocktail recipes, calculate quantities for extra guests, or help trim your budget. (Tip: Connected to built-in smart assistant engine).`,
+        text: `I'm your CymbalMart Shopping Agent! I can help you swap items for CymbalMart Select brands, calculate drink quantities, adjust for dietary restrictions (Gluten-Free, Vegan), or trim your cart to meet your budget.`,
         suggestedPrompts: [
-          'How can I cut $30 from this budget?',
-          'Suggest a signature batch cocktail recipe',
-          'Add gluten-free appetizer options',
+          'Trim $25 from my cart',
+          'Make this 100% Gluten-Free',
+          'Add a signature batch cocktail recipe',
         ],
       });
     }
 
     const itemsSummary = (currentPlan?.items || [])
       .slice(0, 30)
-      .map((it: ShoppingItem) => `- ${it.name} (${it.quantity} ${it.unit}, $${it.estimatedPrice}, at ${it.store})`)
+      .map((it: ShoppingItem) => `- ${it.name} (${it.quantity} ${it.unit}, $${it.estimatedPrice}, ${it.isCymbalMartBrand ? '[CymbalMart Select]' : ''} at ${it.store})`)
       .join('\n');
 
-    const systemPrompt = `You are Festivity, a savvy, enthusiastic Party Planner and Grocery Shopping Agent.
-Current Party Context:
-- Event: ${currentPlan?.details?.title || 'Party'} (${currentPlan?.details?.eventType || 'Celebration'})
+    const systemPrompt = `You are the CymbalMart Shopping Agent, an expert retail shopping concierge for party hosts.
+Party Context:
+- Occasion: ${currentPlan?.details?.title || 'Party'} (${currentPlan?.details?.eventType || 'Celebration'})
 - Guests: ${currentPlan?.details?.guestCountAdults || 10} adults, ${currentPlan?.details?.guestCountKids || 0} kids
-- Budget Limit: $${currentPlan?.details?.budgetLimit || 200}
+- Budget Ceiling: $${currentPlan?.details?.budgetLimit || 200}
 - Current Shopping List (${currentPlan?.items?.length || 0} items):
 ${itemsSummary}
 
-Your goals:
-1. Provide punchy, helpful, practical party host advice.
-2. If the user asks to add items (e.g. "Add 2 bottles of prosecco and orange juice for mimosas" or "We need vegetarian sliders"), generate the structured item in 'itemModifications.added'.
-3. If the user asks to cut costs or remove items, specify their names or IDs in 'itemModifications.removedIds'.
-4. Provide 2-3 short clickable follow-up prompt ideas for the host.`;
+Rules:
+1. Always be helpful, upbeat, efficient, and budget-conscious.
+2. If the user asks to add items, provide them in 'itemModifications.added' with realistic USD prices and CymbalMart brand/store tagging.
+3. If the user asks to cut costs or remove items, specify IDs in 'itemModifications.removedIds'.
+4. If the user asks to refine for dietary constraints (e.g. Vegan, Gluten-Free), suggest smart swaps.
+5. Provide 2-3 short clickable follow-up prompts.`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-3.8-flash',
+      model: 'gemini-2.5-flash',
       contents: message,
       config: {
         systemInstruction: systemPrompt,
@@ -325,6 +505,9 @@ Your goals:
                       store: { type: Type.STRING },
                       priority: { type: Type.STRING },
                       notes: { type: Type.STRING },
+                      isCymbalMartBrand: { type: Type.BOOLEAN },
+                      brandName: { type: Type.STRING },
+                      aisleNumber: { type: Type.STRING },
                     },
                     required: ['name', 'category', 'quantity', 'unit', 'estimatedPrice', 'store', 'priority'],
                   },
@@ -343,12 +526,14 @@ Your goals:
 
     const parsed = JSON.parse(response.text || '{}');
 
-    // Add unique IDs to any added items
     if (parsed.itemModifications?.added) {
       parsed.itemModifications.added = parsed.itemModifications.added.map((item: any, i: number) => ({
         ...item,
         id: `added_${Date.now()}_${i}`,
         isBought: false,
+        isCymbalMartBrand: item.isCymbalMartBrand ?? true,
+        brandName: item.brandName || 'CymbalMart Select',
+        store: item.store || 'CymbalMart Supercenter',
       }));
     }
 
@@ -356,13 +541,13 @@ Your goals:
   } catch (err: any) {
     console.error('Chat error:', err);
     res.json({
-      text: "I received your request! Let's optimize your party shopping list. You can add or adjust any item directly from the shopping list or ask me another question.",
-      suggestedPrompts: ['How much ice do I need?', 'Recommend a batch cocktail'],
+      text: "I'm ready to help you optimize your CymbalMart cart! You can adjust any item on the list or ask me to find budget-friendly swaps.",
+      suggestedPrompts: ['How much ice do I need?', 'Swap to CymbalMart Select brands'],
     });
   }
 });
 
-// 3. Recipe-to-Shopping-List Conversion Endpoint
+// 4. Recipe-to-Shopping-List Conversion
 app.post('/api/recipe-to-list', async (req, res) => {
   try {
     const { recipeText, servings } = req.body;
@@ -375,25 +560,28 @@ app.post('/api/recipe-to-list', async (req, res) => {
         items: [
           {
             id: `rec_${Date.now()}_1`,
-            name: `${recipeText} Main Ingredients`,
+            name: `${recipeText} Ingredients Kit`,
             category: 'produce',
             quantity: 1,
             unit: 'kit',
             estimatedPrice: 12,
-            store: 'Trader Joe’s',
+            store: 'CymbalMart Fresh Market',
             priority: 'recommended',
             isBought: false,
+            isCymbalMartBrand: true,
+            brandName: 'CymbalMart Fresh',
+            aisleNumber: 'Aisle 1',
           },
         ],
       });
     }
 
-    const prompt = `Convert the following dish or recipe into grocery shopping list items scaled for ${servings || 12} party guests:
+    const prompt = `Convert the following dish or recipe into CymbalMart grocery shopping list items scaled for ${servings || 12} party guests:
 Recipe: "${recipeText}".
-Return items with standard categories, reasonable stores, realistic USD prices, and quantities.`;
+Return items with standard categories, CymbalMart stores, realistic USD prices, aisle numbers, and CymbalMart Select private brand tags where appropriate.`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-3.8-flash',
+      model: 'gemini-2.5-flash',
       contents: prompt,
       config: {
         responseMimeType: 'application/json',
@@ -413,6 +601,9 @@ Return items with standard categories, reasonable stores, realistic USD prices, 
                   store: { type: Type.STRING },
                   priority: { type: Type.STRING },
                   notes: { type: Type.STRING },
+                  isCymbalMartBrand: { type: Type.BOOLEAN },
+                  brandName: { type: Type.STRING },
+                  aisleNumber: { type: Type.STRING },
                 },
                 required: ['name', 'category', 'quantity', 'unit', 'estimatedPrice', 'store', 'priority'],
               },
@@ -428,12 +619,40 @@ Return items with standard categories, reasonable stores, realistic USD prices, 
       ...it,
       id: `rec_${Date.now()}_${idx}`,
       isBought: false,
+      isCymbalMartBrand: it.isCymbalMartBrand ?? true,
+      brandName: it.brandName || 'CymbalMart Select',
+      store: it.store || 'CymbalMart Supercenter',
     }));
 
     res.json({ items });
   } catch (err: any) {
     console.error('Recipe conversion error:', err);
     res.status(500).json({ error: 'Failed to convert recipe to shopping items.' });
+  }
+});
+
+// 5. Checkout & Order Placement Endpoint (Task 3: Refine & Checkout)
+app.post('/api/checkout', async (req, res) => {
+  try {
+    const { plan, fulfillment } = req.body;
+    const orderNumber = `CYMBAL-MART-${Math.floor(100000 + Math.random() * 900000)}`;
+    const placedAt = new Date().toISOString();
+
+    res.json({
+      success: true,
+      orderNumber,
+      placedAt,
+      fulfillment: {
+        ...fulfillment,
+        orderNumber,
+        status: 'placed',
+        placedAt,
+      },
+      message: `Your CymbalMart Party Order #${orderNumber} has been received!`,
+    });
+  } catch (err: any) {
+    console.error('Checkout error:', err);
+    res.status(500).json({ error: 'Failed to complete checkout.' });
   }
 });
 
@@ -453,7 +672,7 @@ async function setupServer() {
   }
 
   app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Festivity Party Planner Server running on http://0.0.0.0:${PORT}`);
+    console.log(`CymbalMart Shopping Agent Server running on http://0.0.0.0:${PORT}`);
   });
 }
 

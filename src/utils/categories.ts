@@ -3,7 +3,8 @@ import { CategoryId, CategoryMeta, StoreType } from '../types/party';
 export const PARTY_CATEGORIES: CategoryMeta[] = [
   {
     id: 'proteins',
-    name: 'Proteins & Mains',
+    name: 'Butcher & Seafood',
+    aisle: 'Aisle 4',
     icon: 'Beef',
     emoji: '🥩',
     color: '#ef4444',
@@ -12,6 +13,7 @@ export const PARTY_CATEGORIES: CategoryMeta[] = [
   {
     id: 'produce',
     name: 'Fresh Produce & Herbs',
+    aisle: 'Aisle 1',
     icon: 'Salad',
     emoji: '🥗',
     color: '#10b981',
@@ -19,7 +21,8 @@ export const PARTY_CATEGORIES: CategoryMeta[] = [
   },
   {
     id: 'dairy_charcuterie',
-    name: 'Dairy, Cheeses & Dips',
+    name: 'Deli, Cheese & Dips',
+    aisle: 'Aisle 3',
     icon: 'UtensilsCrossed',
     emoji: '🧀',
     color: '#f59e0b',
@@ -27,7 +30,8 @@ export const PARTY_CATEGORIES: CategoryMeta[] = [
   },
   {
     id: 'bakery',
-    name: 'Bakery, Buns & Desserts',
+    name: 'Bakery & Sweets',
+    aisle: 'Aisle 2',
     icon: 'Cake',
     emoji: '🥖',
     color: '#d97706',
@@ -35,31 +39,35 @@ export const PARTY_CATEGORIES: CategoryMeta[] = [
   },
   {
     id: 'pantry_snacks',
-    name: 'Pantry, Chips & Condiments',
+    name: 'Pantry, Chips & Salsas',
+    aisle: 'Aisle 5',
     icon: 'Package',
     emoji: '🥫',
     color: '#8b5cf6',
     badgeBg: 'bg-purple-50 text-purple-700 border-purple-200',
   },
   {
-    id: 'alcohol',
-    name: 'Beer, Wine & Spirits',
-    icon: 'Wine',
-    emoji: '🍷',
-    color: '#ec4899',
-    badgeBg: 'bg-pink-50 text-pink-700 border-pink-200',
-  },
-  {
     id: 'beverages_mixers',
-    name: 'Sodas, Mixers & Juices',
+    name: 'Mixers, Juices & Sodas',
+    aisle: 'Aisle 6',
     icon: 'CupSoda',
     emoji: '🧃',
     color: '#06b6d4',
     badgeBg: 'bg-cyan-50 text-cyan-700 border-cyan-200',
   },
   {
+    id: 'alcohol',
+    name: 'Wine, Craft Beer & Spirits',
+    aisle: 'Aisle 7',
+    icon: 'Wine',
+    emoji: '🍷',
+    color: '#ec4899',
+    badgeBg: 'bg-pink-50 text-pink-700 border-pink-200',
+  },
+  {
     id: 'ice',
     name: 'Party Ice & Chilling',
+    aisle: 'Aisle 8 (Freezer)',
     icon: 'Snowflake',
     emoji: '🧊',
     color: '#3b82f6',
@@ -67,7 +75,8 @@ export const PARTY_CATEGORIES: CategoryMeta[] = [
   },
   {
     id: 'tableware',
-    name: 'Cups, Plates & Napkins',
+    name: 'Plates, Cups & Eco-Paper',
+    aisle: 'Aisle 9',
     icon: 'Sparkles',
     emoji: '🍽️',
     color: '#64748b',
@@ -75,7 +84,8 @@ export const PARTY_CATEGORIES: CategoryMeta[] = [
   },
   {
     id: 'decor_ambience',
-    name: 'Decor, Lighting & Music',
+    name: 'Party Supplies & Ambience',
+    aisle: 'Aisle 10',
     icon: 'PartyPopper',
     emoji: '🎈',
     color: '#f43f5e',
@@ -84,6 +94,7 @@ export const PARTY_CATEGORIES: CategoryMeta[] = [
   {
     id: 'favors_activities',
     name: 'Favors, Games & Activities',
+    aisle: 'Aisle 11',
     icon: 'Gift',
     emoji: '🎁',
     color: '#14b8a6',
@@ -92,26 +103,31 @@ export const PARTY_CATEGORIES: CategoryMeta[] = [
 ];
 
 export const STORES_LIST: StoreType[] = [
-  'Costco / Wholesale',
-  'Trader Joe’s',
-  'Target',
+  'CymbalMart Supercenter',
+  'CymbalMart Fresh Market',
+  'CymbalMart Wine & Spirits',
+  'CymbalMart Wholesale Club',
+  'CymbalMart Express',
   'Local Supermarket',
-  'Liquor Store',
-  'Amazon / Online',
-  'Bakery / Specialty',
-  'Other'
+  'Specialty Market',
 ];
 
 export const STORE_COLORS: Record<StoreType, { bg: string; text: string; border: string }> = {
-  'Costco / Wholesale': { bg: 'bg-red-50', text: 'text-red-700', border: 'border-red-200' },
-  'Trader Joe’s': { bg: 'bg-amber-50', text: 'text-amber-800', border: 'border-amber-200' },
-  'Target': { bg: 'bg-rose-50', text: 'text-rose-700', border: 'border-rose-200' },
-  'Local Supermarket': { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200' },
-  'Liquor Store': { bg: 'bg-indigo-50', text: 'text-indigo-700', border: 'border-indigo-200' },
-  'Amazon / Online': { bg: 'bg-orange-50', text: 'text-orange-700', border: 'border-orange-200' },
-  'Bakery / Specialty': { bg: 'bg-yellow-50', text: 'text-yellow-800', border: 'border-yellow-200' },
-  'Other': { bg: 'bg-slate-50', text: 'text-slate-700', border: 'border-slate-200' },
+  'CymbalMart Supercenter': { bg: 'bg-teal-50', text: 'text-teal-800', border: 'border-teal-200' },
+  'CymbalMart Fresh Market': { bg: 'bg-emerald-50', text: 'text-emerald-800', border: 'border-emerald-200' },
+  'CymbalMart Wine & Spirits': { bg: 'bg-purple-50', text: 'text-purple-800', border: 'border-purple-200' },
+  'CymbalMart Wholesale Club': { bg: 'bg-blue-50', text: 'text-blue-800', border: 'border-blue-200' },
+  'CymbalMart Express': { bg: 'bg-amber-50', text: 'text-amber-800', border: 'border-amber-200' },
+  'Local Supermarket': { bg: 'bg-slate-50', text: 'text-slate-700', border: 'border-slate-200' },
+  'Specialty Market': { bg: 'bg-rose-50', text: 'text-rose-700', border: 'border-rose-200' },
 };
+
+export const CYMBALMART_LOCATIONS = [
+  'CymbalMart Supercenter #101 - Metro Center',
+  'CymbalMart Fresh Market #204 - West End',
+  'CymbalMart Supercenter #312 - Oakridge Plaza',
+  'CymbalMart Express #405 - Downtown Transit',
+];
 
 export function getCategoryMeta(id: CategoryId): CategoryMeta {
   return PARTY_CATEGORIES.find((c) => c.id === id) || PARTY_CATEGORIES[0];

@@ -7,9 +7,11 @@ import {
   DollarSign, 
   Users, 
   CheckCircle2, 
-  PartyPopper,
   ShoppingBag,
-  Bot
+  Bot,
+  Store,
+  Sliders,
+  CalendarDays
 } from 'lucide-react';
 import { PartyPlan } from '../types/party';
 
@@ -49,17 +51,17 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Top Navbar */}
         <div className="flex items-center justify-between h-16 gap-3">
-          {/* Brand */}
+          {/* CymbalMart Brand */}
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-linear-to-tr from-rose-500 via-amber-500 to-violet-600 flex items-center justify-center text-white shadow-md shadow-rose-500/20">
-              <PartyPopper className="w-5 h-5" />
+            <div className="h-10 w-10 rounded-xl bg-linear-to-tr from-teal-600 via-teal-700 to-indigo-800 flex items-center justify-center text-white shadow-md shadow-teal-700/20">
+              <Store className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-heading font-extrabold text-xl tracking-tight text-slate-900">
-                  Festivity
+                  Cymbal<span className="text-teal-600">Mart</span>
                 </span>
-                <span className="text-[11px] font-semibold tracking-wide uppercase px-2 py-0.5 rounded-full bg-rose-100 text-rose-700 border border-rose-200/60">
+                <span className="text-[11px] font-semibold tracking-wide uppercase px-2 py-0.5 rounded-full bg-teal-50 text-teal-700 border border-teal-200/70">
                   Shopping Agent
                 </span>
               </div>
@@ -81,24 +83,24 @@ export const Header: React.FC<HeaderProps> = ({
             <div className="h-4 w-px bg-slate-200" />
 
             <div className="flex items-center gap-1.5 text-slate-700">
-              <DollarSign className="w-4 h-4 text-emerald-500" />
+              <DollarSign className="w-4 h-4 text-emerald-600" />
               <span>
                 <strong className={isOverBudget ? 'text-rose-600 font-bold' : 'text-slate-900'}>
                   ${totalCost.toFixed(0)}
                 </strong>{' '}
                 / ${budget}{' '}
-                <span className="text-slate-400">(${costPerGuest}/ea)</span>
+                <span className="text-slate-400">(${costPerGuest}/guest)</span>
               </span>
             </div>
 
             <div className="h-4 w-px bg-slate-200" />
 
             <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-indigo-500" />
+              <CheckCircle2 className="w-4 h-4 text-teal-600" />
               <div className="flex items-center gap-2">
                 <div className="w-16 h-2 bg-slate-200 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-linear-to-r from-indigo-500 to-emerald-500 transition-all duration-300"
+                    className="h-full bg-linear-to-r from-teal-500 to-emerald-500 transition-all duration-300"
                     style={{ width: `${percentBought}%` }}
                   />
                 </div>
@@ -113,13 +115,13 @@ export const Header: React.FC<HeaderProps> = ({
               onClick={onToggleAIAssistant}
               className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all shadow-xs ${
                 isAIAssistantOpen
-                  ? 'bg-violet-600 text-white shadow-violet-500/25 ring-2 ring-violet-400/40'
-                  : 'bg-violet-50 text-violet-700 hover:bg-violet-100 border border-violet-200'
+                  ? 'bg-teal-700 text-white shadow-teal-700/25 ring-2 ring-teal-400/40'
+                  : 'bg-teal-50 text-teal-800 hover:bg-teal-100 border border-teal-200'
               }`}
-              title="Toggle AI Party Copilot"
+              title="Toggle CymbalMart Shopping Agent Chat"
             >
               <Bot className="w-4 h-4" />
-              <span className="hidden sm:inline">AI Copilot</span>
+              <span className="hidden sm:inline">AI Agent</span>
             </button>
 
             <button
@@ -142,61 +144,85 @@ export const Header: React.FC<HeaderProps> = ({
 
             <button
               onClick={onOpenNewPartyModal}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-lg bg-linear-to-r from-rose-500 to-amber-500 hover:from-rose-600 hover:to-amber-600 text-white shadow-sm transition-all active:scale-95"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-lg bg-linear-to-r from-teal-600 to-indigo-700 hover:from-teal-700 hover:to-indigo-800 text-white shadow-sm transition-all active:scale-95"
             >
               <Plus className="w-4 h-4" />
-              <span>New Plan</span>
+              <span>New Event</span>
             </button>
           </div>
         </div>
 
-        {/* Tab Navigation */}
+        {/* CUJ Stage Tabs Navigation */}
         <div className="flex items-center gap-1 overflow-x-auto py-2 border-t border-slate-100 scrollbar-none">
+          {/* CUJ Task 1 */}
           <button
-            onClick={() => setActiveTab('shopping')}
-            className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap flex items-center gap-1.5 ${
-              activeTab === 'shopping'
-                ? 'bg-slate-900 text-white shadow-xs'
+            onClick={() => setActiveTab('define')}
+            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors whitespace-nowrap flex items-center gap-1.5 ${
+              activeTab === 'define'
+                ? 'bg-teal-800 text-white shadow-xs'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+            }`}
+          >
+            <Sparkles className="w-3.5 h-3.5 text-teal-300" />
+            <span>1. Define Event</span>
+          </button>
+
+          {/* CUJ Task 2 */}
+          <button
+            onClick={() => setActiveTab('review')}
+            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors whitespace-nowrap flex items-center gap-1.5 ${
+              activeTab === 'review'
+                ? 'bg-teal-800 text-white shadow-xs'
                 : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
             }`}
           >
             <ShoppingBag className="w-3.5 h-3.5" />
-            <span>Shopping List ({totalItems})</span>
+            <span>2. Review List ({totalItems})</span>
+            {isOverBudget && (
+              <span className="h-2 w-2 rounded-full bg-rose-500 ring-2 ring-white" />
+            )}
           </button>
 
+          {/* CUJ Task 3 */}
+          <button
+            onClick={() => setActiveTab('checkout')}
+            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors whitespace-nowrap flex items-center gap-1.5 ${
+              activeTab === 'checkout'
+                ? 'bg-teal-800 text-white shadow-xs'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+            }`}
+          >
+            <Sliders className="w-3.5 h-3.5" />
+            <span>3. Refine & Checkout</span>
+            {currentPlan.fulfillment?.status === 'placed' && (
+              <span className="text-[10px] bg-emerald-500 text-white px-1.5 py-0.2 rounded-full">Placed</span>
+            )}
+          </button>
+
+          <div className="h-4 w-px bg-slate-200 mx-1 shrink-0" />
+
+          {/* Supplementary Calculators & Timeline */}
           <button
             onClick={() => setActiveTab('calculator')}
-            className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap flex items-center gap-1.5 ${
+            className={`px-2.5 py-1.5 text-xs font-medium rounded-lg transition-colors whitespace-nowrap flex items-center gap-1.5 ${
               activeTab === 'calculator'
                 ? 'bg-slate-900 text-white shadow-xs'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
             }`}
           >
             <Users className="w-3.5 h-3.5" />
-            <span>Quantity & Drink Calc</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('budget')}
-            className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap flex items-center gap-1.5 ${
-              activeTab === 'budget'
-                ? 'bg-slate-900 text-white shadow-xs'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-            }`}
-          >
-            <DollarSign className="w-3.5 h-3.5" />
-            <span>Budget & Potluck Split</span>
+            <span>Portion & Drink Calc</span>
           </button>
 
           <button
             onClick={() => setActiveTab('timeline')}
-            className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap flex items-center gap-1.5 ${
+            className={`px-2.5 py-1.5 text-xs font-medium rounded-lg transition-colors whitespace-nowrap flex items-center gap-1.5 ${
               activeTab === 'timeline'
                 ? 'bg-slate-900 text-white shadow-xs'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
             }`}
           >
-            <Sparkles className="w-3.5 h-3.5" />
+            <CalendarDays className="w-3.5 h-3.5" />
             <span>Prep Timeline & Run of Show</span>
           </button>
         </div>

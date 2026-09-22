@@ -1,6 +1,6 @@
 {
-  "name": "Party Planner Shopping Agent",
-  "description": "AI-powered party planning assistant that calculates quantities, generates categorized shopping lists, optimizes budgets, and provides step-by-step prep timelines.",
+  "name": "CymbalMart Shopping Agent",
+  "description": "AI-powered party planner shopping agent for CymbalMart that converts event intent into a curated, budget-conscious shopping list and order checkout.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

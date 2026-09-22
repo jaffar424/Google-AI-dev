@@ -9,24 +9,26 @@ import {
   Check, 
   Share2, 
   Bot,
-  PartyPopper,
-  Flame,
-  Tag
+  Store,
+  Sliders,
+  ShoppingBag,
+  ArrowRight
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import { PartyPlan, ShoppingItem, PartyDetails } from './types/party';
+import { PartyPlan, ShoppingItem, PartyDetails, FulfillmentDetails } from './types/party';
 import { createPartyFromTemplate } from './utils/templates';
 import { calculatePartyDrinks, calculatePartyFood } from './utils/calculator';
 import { Header } from './components/Header';
-import { ShoppingListTab } from './components/ShoppingListTab';
+import { DefineEventTab } from './components/DefineEventTab';
+import { ReviewListTab } from './components/ReviewListTab';
+import { RefineCheckoutTab } from './components/RefineCheckoutTab';
 import { PartyCalculatorTab } from './components/PartyCalculatorTab';
-import { BudgetAnalyticsTab } from './components/BudgetAnalyticsTab';
 import { TimelineRunOfShowTab } from './components/TimelineRunOfShowTab';
 import { AIAssistantDrawer } from './components/AIAssistantDrawer';
 import { NewPartyModal } from './components/NewPartyModal';
 import { PrintView } from './components/PrintView';
 
-const STORAGE_KEY = 'festivity_party_plan_v1';
+const STORAGE_KEY = 'cymbalmart_party_plan_v2';
 
 export default function App() {
   const [currentPlan, setCurrentPlan] = useState<PartyPlan>(() => {
@@ -39,7 +41,8 @@ export default function App() {
     return createPartyFromTemplate('taco_fiesta');
   });
 
-  const [activeTab, setActiveTab] = useState<string>('shopping');
+  // Default active tab to review if plan exists, or define if host wants fresh start
+  const [activeTab, setActiveTab] = useState<string>('review');
   const [isAIAssistantOpen, setIsAIAssistantOpen] = useState(false);
   const [isNewPartyModalOpen, setIsNewPartyModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -65,7 +68,6 @@ export default function App() {
         item.id === id ? { ...item, isBought: !item.isBought } : item
       );
 
-      // Check if all items bought
       const allBought = updated.every((i) => i.isBought);
       if (allBought && updated.length > 0) {
         confetti({
@@ -73,7 +75,7 @@ export default function App() {
           spread: 80,
           origin: { y: 0.6 },
         });
-        showToast('🎉 All shopping items checked off!');
+        showToast('🎉 All CymbalMart items in cart!');
       }
 
       return { ...prev, items: updated };
@@ -97,22 +99,37 @@ export default function App() {
       ...prev,
       items: [item, ...prev.items],
     }));
-    showToast(`Added "${item.name}" to shopping list`);
+    showToast(`Added "${item.name}" to cart`);
   };
 
-  const handleUpdateItem = (id: string, updates: Partial<ShoppingItem>) => {
+  const handleUpdateItemQuantity = (id: string, newQty: number) => {
     setCurrentPlan((prev) => ({
       ...prev,
-      items: prev.items.map((it) => (it.id === id ? { ...it, ...updates } : it)),
+      items: prev.items.map((it) => {
+        if (it.id !== id) return it;
+        const singlePrice = it.quantity > 0 ? it.estimatedPrice / it.quantity : it.estimatedPrice;
+        return {
+          ...it,
+          quantity: newQty,
+          estimatedPrice: Math.round(singlePrice * newQty * 100) / 100,
+        };
+      }),
     }));
   };
 
-  const handleBulkMark = (bought: boolean) => {
+  const handleUpdatePlanItems = (newItems: ShoppingItem[]) => {
     setCurrentPlan((prev) => ({
       ...prev,
-      items: prev.items.map((it) => ({ ...it, isBought: bought })),
+      items: newItems,
     }));
-    showToast(bought ? 'Marked all items as purchased!' : 'Reset all checkboxes.');
+  };
+
+  const handleUpdateFulfillment = (fulfillment: FulfillmentDetails) => {
+    setCurrentPlan((prev) => ({
+      ...prev,
+      fulfillment,
+    }));
+    showToast('Order details updated!');
   };
 
   // Quantity Recalibration & Sync
@@ -139,7 +156,7 @@ export default function App() {
             ...item,
             quantity: drinkCalc.iceLbs,
             unit: 'lbs',
-            estimatedPrice: Math.ceil(drinkCalc.iceLbs * 0.35),
+            estimatedPrice: Math.ceil(drinkCalc.iceLbs * 0.3),
           };
         }
 
@@ -152,7 +169,7 @@ export default function App() {
             ...item,
             quantity: drinkCalc.beerBottles,
             unit: 'bottles/cans',
-            estimatedPrice: Math.ceil(drinkCalc.beerBottles * 1.25),
+            estimatedPrice: Math.ceil(drinkCalc.beerBottles * 1.15),
           };
         }
 
@@ -162,7 +179,7 @@ export default function App() {
             ...item,
             quantity: Math.max(1, Math.round(drinkCalc.wineBottles / 2)),
             unit: 'bottles',
-            estimatedPrice: Math.max(1, Math.round(drinkCalc.wineBottles / 2)) * 14,
+            estimatedPrice: Math.max(1, Math.round(drinkCalc.wineBottles / 2)) * 13,
           };
         }
 
@@ -180,7 +197,7 @@ export default function App() {
             ...item,
             quantity: scaledLbs,
             unit: 'lbs',
-            estimatedPrice: scaledLbs * 4.5,
+            estimatedPrice: scaledLbs * 4.25,
           };
         }
 
@@ -193,7 +210,7 @@ export default function App() {
       };
     });
 
-    showToast('Recalculated & updated grocery quantities!');
+    showToast('Recalculated quantities for guest count!');
   };
 
   // AI Assistant Integrations
@@ -202,7 +219,7 @@ export default function App() {
       ...prev,
       items: [...newItems, ...prev.items],
     }));
-    showToast(`Added ${newItems.length} items from Festivity Copilot!`);
+    showToast(`Added ${newItems.length} items from CymbalMart Copilot!`);
   };
 
   const handleApplyRemovedItems = (itemIds: string[]) => {
@@ -210,7 +227,7 @@ export default function App() {
       ...prev,
       items: prev.items.filter((it) => !itemIds.includes(it.id)),
     }));
-    showToast(`Removed items to cut costs.`);
+    showToast(`Trimmed items from cart.`);
   };
 
   // Timeline Handlers
@@ -255,10 +272,10 @@ export default function App() {
   };
 
   const handleShare = () => {
-    const text = `🎉 Planning "${currentPlan.themeTitle || currentPlan.details.title}" with Festivity Party Shopping Agent! ${currentPlan.items.length} shopping items organized.`;
+    const text = `🛒 CymbalMart Shopping Agent: "${currentPlan.themeTitle || currentPlan.details.title}" with ${currentPlan.items.length} curated grocery items. Budget: $${currentPlan.details.budgetLimit}.`;
     if (navigator.clipboard) {
       navigator.clipboard.writeText(text);
-      showToast('Party summary copied to clipboard!');
+      showToast('Party plan & shopping link copied to clipboard!');
     }
   };
 
@@ -267,7 +284,7 @@ export default function App() {
       {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl text-xs font-semibold flex items-center gap-2 animate-in fade-in slide-in-from-bottom-2">
-          <Check className="w-4 h-4 text-emerald-400 stroke-[3]" />
+          <Check className="w-4 h-4 text-teal-400 stroke-[3]" />
           <span>{toastMessage}</span>
         </div>
       )}
@@ -284,111 +301,111 @@ export default function App() {
         setActiveTab={setActiveTab}
       />
 
-      {/* Page Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full space-y-6">
-        {/* Themed Hero Card */}
-        <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-xs relative overflow-hidden">
-          {/* Subtle decorative background gradient */}
-          <div className="absolute top-0 right-0 w-96 h-96 bg-linear-to-bl from-rose-100/40 via-amber-100/30 to-transparent rounded-full blur-2xl pointer-events-none -mr-20 -mt-20" />
+      {/* CUJ Stepper Tracker Banner */}
+      <div className="bg-white border-b border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+          <div className="flex items-center justify-between text-xs font-semibold text-slate-500">
+            <span className="hidden sm:inline">Critical User Journey:</span>
+            
+            <div className="flex items-center gap-2 sm:gap-4 flex-1 justify-center sm:justify-start sm:ml-4">
+              <button
+                onClick={() => setActiveTab('define')}
+                className={`flex items-center gap-1.5 transition-colors ${
+                  activeTab === 'define'
+                    ? 'text-teal-700 font-extrabold'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] ${
+                  activeTab === 'define' ? 'bg-teal-700 text-white' : 'bg-slate-200 text-slate-700'
+                }`}>1</span>
+                <span>Define Event</span>
+              </button>
 
-          <div className="relative z-10 space-y-4">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="px-3 py-1 rounded-full bg-slate-900 text-white text-xs font-bold tracking-wide">
-                  {currentPlan.details.eventType || 'Dinner Party'}
-                </span>
-                {currentPlan.vibeKeywords &&
-                  currentPlan.vibeKeywords.map((kw, i) => (
-                    <span
-                      key={i}
-                      className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[11px] font-medium border border-slate-200"
-                    >
-                      {kw}
-                    </span>
-                  ))}
-              </div>
+              <span className="text-slate-300">→</span>
 
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setIsAIAssistantOpen(true)}
-                  className="px-3 py-1.5 rounded-xl bg-violet-50 hover:bg-violet-100 text-violet-700 text-xs font-bold flex items-center gap-1.5 transition-colors border border-violet-200/60"
-                >
-                  <Bot className="w-3.5 h-3.5" />
-                  <span>Ask Copilot to Customize</span>
-                </button>
-              </div>
+              <button
+                onClick={() => setActiveTab('review')}
+                className={`flex items-center gap-1.5 transition-colors ${
+                  activeTab === 'review'
+                    ? 'text-teal-700 font-extrabold'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] ${
+                  activeTab === 'review' ? 'bg-teal-700 text-white' : 'bg-slate-200 text-slate-700'
+                }`}>2</span>
+                <span>Review List & Align Budget</span>
+              </button>
+
+              <span className="text-slate-300">→</span>
+
+              <button
+                onClick={() => setActiveTab('checkout')}
+                className={`flex items-center gap-1.5 transition-colors ${
+                  activeTab === 'checkout'
+                    ? 'text-teal-700 font-extrabold'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] ${
+                  activeTab === 'checkout' ? 'bg-teal-700 text-white' : 'bg-slate-200 text-slate-700'
+                }`}>3</span>
+                <span>Refine & Checkout</span>
+              </button>
             </div>
 
-            <div>
-              <h1 className="font-heading font-extrabold text-2xl sm:text-3xl text-slate-900 tracking-tight">
-                {currentPlan.themeTitle || currentPlan.details.title}
-              </h1>
-              <p className="text-xs sm:text-sm text-slate-600 mt-1 max-w-3xl leading-relaxed">
-                {currentPlan.themeDescription}
-              </p>
+            <div className="hidden md:flex items-center gap-2 text-teal-800 bg-teal-50 px-2.5 py-1 rounded-full border border-teal-200">
+              <Store className="w-3.5 h-3.5 text-teal-600" />
+              <span>CymbalMart Curated List</span>
             </div>
-
-            {/* Signature Drinks Spotlight */}
-            {(currentPlan.signatureCocktail || currentPlan.signatureMocktail) && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                {currentPlan.signatureCocktail && (
-                  <div className="p-3.5 rounded-2xl bg-linear-to-br from-rose-50/70 to-pink-50/40 border border-rose-200/60 flex items-start gap-3">
-                    <div className="p-2 rounded-xl bg-rose-100 text-rose-700 shrink-0">
-                      <Wine className="w-4 h-4" />
-                    </div>
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-extrabold uppercase tracking-wider text-rose-700">
-                          Signature Cocktail
-                        </span>
-                      </div>
-                      <h4 className="text-xs font-bold text-slate-900 truncate mt-0.5">
-                        {currentPlan.signatureCocktail.name}
-                      </h4>
-                      <p className="text-[11px] text-slate-600 line-clamp-2 mt-0.5">
-                        {currentPlan.signatureCocktail.description}
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                {currentPlan.signatureMocktail && (
-                  <div className="p-3.5 rounded-2xl bg-linear-to-br from-cyan-50/70 to-blue-50/40 border border-cyan-200/60 flex items-start gap-3">
-                    <div className="p-2 rounded-xl bg-cyan-100 text-cyan-700 shrink-0">
-                      <CupSoda className="w-4 h-4" />
-                    </div>
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-extrabold uppercase tracking-wider text-cyan-700">
-                          Zero-Proof Signature
-                        </span>
-                      </div>
-                      <h4 className="text-xs font-bold text-slate-900 truncate mt-0.5">
-                        {currentPlan.signatureMocktail.name}
-                      </h4>
-                      <p className="text-[11px] text-slate-600 line-clamp-2 mt-0.5">
-                        {currentPlan.signatureMocktail.description}
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
           </div>
         </div>
+      </div>
 
-        {/* Tab Content Display */}
-        {activeTab === 'shopping' && (
-          <ShoppingListTab
-            items={currentPlan.items}
-            onToggleItem={handleToggleItem}
-            onDeleteItem={handleDeleteItem}
-            onAddItem={handleAddItem}
-            onUpdateItem={handleUpdateItem}
-            onBulkMark={handleBulkMark}
+      {/* Main Page Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full space-y-6">
+        {/* Step 1: Define Event */}
+        {activeTab === 'define' && (
+          <DefineEventTab
+            currentPlan={currentPlan}
+            onPlanGenerated={(newPlan) => {
+              setCurrentPlan(newPlan);
+              showToast(`Created "${newPlan.themeTitle || newPlan.details.title}"!`);
+            }}
+            onNavigateToReview={() => setActiveTab('review')}
           />
         )}
 
+        {/* Step 2: Review List */}
+        {activeTab === 'review' && (
+          <ReviewListTab
+            currentPlan={currentPlan}
+            onToggleItem={handleToggleItem}
+            onAddItem={handleAddItem}
+            onRemoveItem={handleDeleteItem}
+            onUpdateItemQuantity={handleUpdateItemQuantity}
+            onUpdatePlanItems={handleUpdatePlanItems}
+            onNavigateToDefine={() => setActiveTab('define')}
+            onNavigateToCheckout={() => setActiveTab('checkout')}
+            onPrint={handlePrint}
+          />
+        )}
+
+        {/* Step 3: Refine & Checkout */}
+        {activeTab === 'checkout' && (
+          <RefineCheckoutTab
+            currentPlan={currentPlan}
+            onUpdatePlanItems={handleUpdatePlanItems}
+            onUpdateFulfillment={handleUpdateFulfillment}
+            onNavigateToReview={() => setActiveTab('review')}
+            onNavigateToDefine={() => setActiveTab('define')}
+            onPrint={handlePrint}
+            onShare={handleShare}
+          />
+        )}
+
+        {/* Supplementary Utility Tab: Calculator */}
         {activeTab === 'calculator' && (
           <PartyCalculatorTab
             currentPlan={currentPlan}
@@ -397,10 +414,7 @@ export default function App() {
           />
         )}
 
-        {activeTab === 'budget' && (
-          <BudgetAnalyticsTab currentPlan={currentPlan} />
-        )}
-
+        {/* Supplementary Utility Tab: Timeline */}
         {activeTab === 'timeline' && (
           <TimelineRunOfShowTab
             currentPlan={currentPlan}
@@ -425,7 +439,7 @@ export default function App() {
         onClose={() => setIsNewPartyModalOpen(false)}
         onPlanCreated={(plan) => {
           setCurrentPlan(plan);
-          setActiveTab('shopping');
+          setActiveTab('review');
           showToast(`Loaded ${plan.themeTitle || plan.details.title}!`);
         }}
       />

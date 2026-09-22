@@ -1,12 +1,11 @@
 export type StoreType = 
-  | 'Costco / Wholesale' 
-  | 'Trader Joe’s' 
-  | 'Target' 
-  | 'Local Supermarket' 
-  | 'Liquor Store' 
-  | 'Amazon / Online' 
-  | 'Bakery / Specialty' 
-  | 'Other';
+  | 'CymbalMart Supercenter' 
+  | 'CymbalMart Fresh Market' 
+  | 'CymbalMart Wine & Spirits' 
+  | 'CymbalMart Wholesale Club' 
+  | 'CymbalMart Express'
+  | 'Local Supermarket'
+  | 'Specialty Market';
 
 export type PriorityLevel = 'essential' | 'recommended' | 'optional';
 
@@ -26,6 +25,7 @@ export type CategoryId =
 export interface CategoryMeta {
   id: CategoryId;
   name: string;
+  aisle: string;
   icon: string;
   emoji: string;
   color: string;
@@ -44,6 +44,11 @@ export interface ShoppingItem {
   notes?: string;
   isBought: boolean;
   assignedTo?: string; // guest name if assigned
+  isCymbalMartBrand?: boolean; // CymbalMart Select / Private Label
+  brandName?: string; // e.g. "CymbalMart Select", "CymbalMart Organic"
+  aisleNumber?: string;
+  dietaryTags?: string[];
+  originalPrice?: number; // for tracking savings
 }
 
 export interface DrinkCalculation {
@@ -99,7 +104,18 @@ export interface PartyDetails {
   drinkStyle: 'full_bar' | 'beer_wine_only' | 'cocktail_special' | 'mocktails_only' | 'byob';
   cateringStyle: 'homemade' | 'semi_homemade' | 'store_bought' | 'bbq_grill';
   dietaryRestrictions: string[];
+  specialRequests?: string;
   date?: string;
+}
+
+export interface FulfillmentDetails {
+  type: 'pickup' | 'delivery';
+  storeLocation: string;
+  deliveryAddress?: string;
+  slot: string;
+  orderNumber?: string;
+  status: 'planning' | 'ready_for_checkout' | 'placed';
+  placedAt?: string;
 }
 
 export interface PartyPlan {
@@ -123,6 +139,7 @@ export interface PartyPlan {
   costSavingTips: string[];
   timeline: TimelinePhase[];
   runOfShow: RunOfShowItem[];
+  fulfillment: FulfillmentDetails;
   createdAt: string;
   updatedAt: string;
 }
@@ -136,6 +153,7 @@ export interface ChatMessage {
   itemModifications?: {
     added?: ShoppingItem[];
     removedIds?: string[];
+    swapped?: Array<{ oldId: string; newItem: ShoppingItem }>;
     note?: string;
   };
 }
